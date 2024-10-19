@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-lexend);
+}
+
+p,
+button,
+label,
+input,
+select,
+textarea,
+a {
+  font-family: var(--font-manjari);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

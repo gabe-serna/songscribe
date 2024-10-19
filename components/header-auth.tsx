@@ -13,11 +13,11 @@ export default async function AuthButton() {
   if (!hasEnvVars) {
     return (
       <>
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4">
           <div>
             <Badge
               variant={"default"}
-              className="font-normal pointer-events-none"
+              className="pointer-events-none font-normal"
             >
               Please update .env.local file with anon key and url
             </Badge>
@@ -28,7 +28,7 @@ export default async function AuthButton() {
               size="sm"
               variant={"outline"}
               disabled
-              className="opacity-75 cursor-none pointer-events-none"
+              className="pointer-events-none cursor-none opacity-75"
             >
               <Link href="/sign-in">Sign in</Link>
             </Button>
@@ -37,7 +37,7 @@ export default async function AuthButton() {
               size="sm"
               variant={"default"}
               disabled
-              className="opacity-75 cursor-none pointer-events-none"
+              className="pointer-events-none cursor-none opacity-75"
             >
               <Link href="/sign-up">Sign up</Link>
             </Button>
