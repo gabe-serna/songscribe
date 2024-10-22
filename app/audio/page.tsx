@@ -16,23 +16,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg"];
+const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
+const apiBaseUrl = "http://localhost:8000";
 
 const formSchema = z.object({
-  file: z
+  audio_file: z
     .any()
-    .refine(
-      (fileList) =>
-        fileList && fileList.length > 0 && fileList[0] instanceof File,
-      { message: "Please upload a valid file." },
-    )
+    .refine((fileList) => fileList && fileList.length > 0, {
+      message: "Please upload a valid file.",
+    })
     .refine(
       (fileList) => {
+        if (!fileList || fileList.length === 0) return false;
         const file = fileList[0];
         return validMimeTypes.includes(file.type);
       },
       {
-        message: "Invalid file type. Only MP3, WAV, or OGG files are allowed.",
+        message:
+          "Invalid file type. Only MP3, WAV, OGG, or FLAC files are allowed.",
       },
     ),
 });
@@ -42,22 +43,23 @@ export default function AudioToMidiForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      file: null,
+      audio_file: null,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const fileList = values.file;
+    const fileList = values.audio_file;
     const file = fileList[0];
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("audio_file", file);
 
     try {
       setIsSubmitting(true);
-      const response = await fetch("/api/convert-to-midi", {
+      const response = await fetch(`${apiBaseUrl}/audio-to-midi`, {
         method: "POST",
+        mode: "cors",
         body: formData,
       });
 
@@ -92,21 +94,21 @@ export default function AudioToMidiForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
-            name="file"
+            name="audio_file"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Upload Audio File</FormLabel>
                 <FormControl>
                   <Input
                     type="file"
-                    accept=".mp3, .wav, .ogg"
+                    accept=".mp3, .wav, .ogg, .flac"
                     onChange={(e) => {
                       field.onChange(e.target.files);
                     }}
                   />
                 </FormControl>
                 <FormDescription>
-                  Upload an MP3, WAV, or OGG file to convert to MIDI.
+                  Upload an audio file to convert to MIDI.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
