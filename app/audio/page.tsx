@@ -15,6 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import MidiVisualizer from "@/components/MidiVisualizer";
 
 const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const apiBaseUrl = "http://localhost:8000";
@@ -38,8 +39,15 @@ const formSchema = z.object({
     ),
 });
 
+interface Visualizer {
+  audioSrc: string;
+  midiBlob: Blob;
+}
+
 export default function AudioToMidiForm() {
+  const [visualizer, setVisualizer] = useState<Visualizer | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -68,18 +76,7 @@ export default function AudioToMidiForm() {
       }
 
       const midiBlob = await response.blob();
-      const midiUrl = URL.createObjectURL(midiBlob);
-
-      // Trigger the download of the MIDI file
-      const link = document.createElement("a");
-      link.href = midiUrl;
-      link.download = "converted.mid"; // Specify the filename
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Optionally revoke the object URL after download
-      URL.revokeObjectURL(midiUrl);
+      setVisualizer({ audioSrc: URL.createObjectURL(file), midiBlob });
     } catch (error) {
       console.error(error);
       alert("Error converting audio to MIDI");
@@ -89,7 +86,7 @@ export default function AudioToMidiForm() {
   }
 
   return (
-    <div className="flex w-full justify-around">
+    <div className="flex w-full flex-col justify-around">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -119,6 +116,14 @@ export default function AudioToMidiForm() {
           </Button>
         </form>
       </Form>
+      {visualizer && (
+        <div>
+          <MidiVisualizer
+            midiBlob={visualizer.midiBlob}
+            audioSrc={visualizer.audioSrc}
+          />
+        </div>
+      )}
     </div>
   );
 }
