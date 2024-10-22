@@ -1,11 +1,13 @@
 "use client";
 
+import PianoRoll from "@/components/PianoRoll";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 import MinimapPlugin from "wavesurfer.js/dist/plugins/minimap";
 
 export default function Preview() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [midiFile, setMidiFile] = useState<File | null>(null);
 
   const { wavesurfer, isReady, isPlaying, currentTime } = useWavesurfer({
     container: containerRef,
@@ -54,6 +56,17 @@ export default function Preview() {
       <div ref={containerRef} />
 
       <button onClick={onPlayPause}>{isPlaying ? "Pause" : "Play"}</button>
+      <div>
+        <input
+          type="file"
+          accept=".mid"
+          onChange={(e) => {
+            if (!e.target.files) return;
+            setMidiFile(e.target.files[0]);
+          }}
+        />
+        {midiFile && <PianoRoll midiFile={midiFile} />}{" "}
+      </div>
     </div>
   );
 }
