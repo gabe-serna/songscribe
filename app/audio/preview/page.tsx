@@ -7,9 +7,10 @@ import MinimapPlugin from "wavesurfer.js/dist/plugins/minimap";
 
 export default function Preview() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [midiFile, setMidiFile] = useState<File | null>(null);
 
-  const { wavesurfer, isReady, isPlaying, currentTime } = useWavesurfer({
+  const { wavesurfer, isReady, currentTime } = useWavesurfer({
     container: containerRef,
     url: "/audio/tsubasa_bass.mp3",
     waveColor: "#eab308",
@@ -47,15 +48,17 @@ export default function Preview() {
     }
   }, [isReady, wavesurfer]);
 
-  const onPlayPause = () => {
+  useEffect(() => {
     wavesurfer && wavesurfer.playPause();
-  };
+  }, [isPlaying]);
 
   return (
     <div className="flex h-full w-[1000px] flex-col justify-center">
       <div ref={containerRef} />
 
-      <button onClick={onPlayPause}>{isPlaying ? "Pause" : "Play"}</button>
+      <button onClick={() => setIsPlaying(!isPlaying)}>
+        {isPlaying ? "Pause" : "Play"}
+      </button>
       <div>
         <input
           type="file"
@@ -65,7 +68,13 @@ export default function Preview() {
             setMidiFile(e.target.files[0]);
           }}
         />
-        {midiFile && <PianoRoll midiFile={midiFile} />}{" "}
+        {midiFile && (
+          <PianoRoll
+            midiFile={midiFile}
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
+          />
+        )}
       </div>
     </div>
   );

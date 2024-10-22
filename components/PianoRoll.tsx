@@ -6,6 +6,8 @@ import { Midi } from "@tonejs/midi";
 
 interface PianoRollProps {
   midiFile: Blob; // Accepting the MIDI file as a Blob prop
+  isPlaying: boolean;
+  setIsPlaying: (isPlaying: boolean) => void;
 }
 
 interface MidiNote {
@@ -14,10 +16,13 @@ interface MidiNote {
   duration: number;
 }
 
-const PianoRoll: React.FC<PianoRollProps> = ({ midiFile }) => {
+const PianoRoll: React.FC<PianoRollProps> = ({
+  midiFile,
+  isPlaying,
+  setIsPlaying,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [midiData, setMidiData] = useState<MidiNote[]>([]);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0); // Track progress of MIDI playback
 
   useEffect(() => {
