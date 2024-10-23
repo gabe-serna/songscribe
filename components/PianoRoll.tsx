@@ -26,7 +26,9 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [midiData, setMidiData] = useState<MidiNote[]>([]);
-  let tempo: number | null = null;
+
+  const tempo = useRef(120);
+  const totalDuration = useRef(0);
 
   useEffect(() => {
     // Parse the MIDI file and extract note data from the Blob
@@ -39,7 +41,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
         // Extract note data
         const notes: MidiNote[] = [];
-        tempo = midi.header.tempos[0].bpm;
+        tempo.current = midi.header.tempos[0].bpm;
         midi.tracks.forEach((track) => {
           track.notes.forEach((note) => {
             notes.push({
@@ -68,13 +70,13 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
     const height = canvas.height;
     const noteHeight = 10; // Height of each note block
-    const totalDuration = Math.max(
+    totalDuration.current = Math.max(
       ...notes.map((note) => note.time + note.duration),
     );
-    const secondsPerBeat = 60 / tempo! || 120;
+    const secondsPerBeat = 60 / tempo.current;
     const eightMeasures = 8 * 4 * secondsPerBeat;
     const timeScale = 1000 / eightMeasures; // Pixels Per Second
-    canvas.width = totalDuration * timeScale + 1000;
+    canvas.width = totalDuration.current * timeScale + 1000;
 
     ctx.clearRect(0, 0, 1000, height);
 
@@ -93,9 +95,10 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   const playMidi = () => {
     const synth = new Tone.PolySynth(Tone.AMSynth).toDestination();
     const transport = Tone.getTransport();
+    const startTime = getScrollTime(progress, totalDuration.current);
 
     midiData.forEach((note) => {
-      let time = note.time - 0.1;
+      let time = note.time - 0.1 - startTime;
       transport.schedule((t) => {
         synth.triggerAttackRelease(note.note, note.duration, t);
       }, time);
@@ -109,8 +112,19 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   const stopMidi = () => {
     const transport = Tone.getTransport();
     transport.stop();
+    transport.cancel();
     setIsPlaying(false);
   };
+
+  useEffect(() => {
+    // Clear Transport if playback is stopped when audio finishes
+    if (!isPlaying) {
+      const transport = Tone.getTransport();
+      transport.stop();
+      transport.cancel();
+      console.log("Transport cancelled");
+    }
+  }, [isPlaying]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -153,4 +167,12 @@ function setScrollPercentage(
   const targetScrollLeft = (percentage / 100) * scrollableWidth;
 
   element.scrollLeft = targetScrollLeft;
+}
+
+function getScrollTime(
+  scrollPercentage: number,
+  totalDuration: number,
+): number {
+  const currentTimeInSeconds = (scrollPercentage / 100) * totalDuration;
+  return currentTimeInSeconds;
 }

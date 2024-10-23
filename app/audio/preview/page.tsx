@@ -2,12 +2,13 @@
 
 import PianoRoll from "@/components/PianoRoll";
 import { useWavesurfer } from "@wavesurfer/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Preview() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const progressRef = useRef<HTMLDivElement | null>(null);
   const ref = useRef<HTMLInputElement | null>(null);
+  const lastRun = useRef(Date.now());
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -15,10 +16,10 @@ export default function Preview() {
 
   const { wavesurfer, isReady, currentTime } = useWavesurfer({
     container: containerRef,
-    url: "/audio/tsubasa_bass.mp3",
-    waveColor: "#eab308",
-    progressColor: "#a16207",
-    height: 200,
+    url: "/audio/rude_alpha_guitar.wav",
+    waveColor: "#44403c", //stone-700
+    progressColor: "#292524", //stone-800
+    height: 100,
     barWidth: 5,
     barHeight: 4,
     barRadius: 5,
@@ -27,11 +28,18 @@ export default function Preview() {
   });
 
   wavesurfer?.on("timeupdate", () => {
-    // if i wanted to use progress as a measure of seconds i can use
-    // these methods below
-    // const time = wavesurfer.getCurrentTime() / wavesurfer.getDuration();
+    const prog = getProgressPercent(progressRef) as number;
+    setProgress(prog);
+  });
 
-    setProgress(getProgressPercent(progressRef) as number);
+  wavesurfer?.on("finish", () => {
+    //Rate Limit Event Firing
+    if (Date.now() - lastRun.current < 1000) return;
+
+    lastRun.current = Date.now();
+    wavesurfer?.stop();
+    setIsPlaying(false);
+    setProgress(0);
   });
 
   // Store Progress Bar Element
@@ -45,15 +53,19 @@ export default function Preview() {
   }, [isReady]);
 
   useEffect(() => {
-    wavesurfer && wavesurfer.playPause();
+    if (isPlaying) {
+      wavesurfer?.play();
+    } else {
+      wavesurfer?.pause();
+    }
   }, [isPlaying]);
 
   //For testing purposes, load a MIDI file on page load
   useEffect(() => {
     async function loadTempFile() {
-      const res = await fetch("/audio/tsubasa_bass.mid");
+      const res = await fetch("/audio/rude_alpha_guitar.mid");
       const blob = await res.blob();
-      const file = new File([blob], "tsubasa_bass.mid", {
+      const file = new File([blob], "rude_alpha_guitar.mid", {
         type: "audio/midi",
       });
 
