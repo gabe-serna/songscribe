@@ -22,12 +22,6 @@ export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Songscribe",
   description: "The fastest way to turn any song into sheet music",
-  icons: {
-    icon: {
-      url: "favicon.png",
-      type: "image/png",
-    },
-  },
 };
 
 export default function RootLayout({
