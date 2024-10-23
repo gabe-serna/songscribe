@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 export default function Preview() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const progressRef = useRef<HTMLDivElement | null>(null);
+  const durationRef = useRef<number | null>(null);
   const ref = useRef<HTMLInputElement | null>(null);
   const lastRun = useRef(Date.now());
 
@@ -50,6 +51,11 @@ export default function Preview() {
     if (!shadowRoot) return;
     progressRef.current = shadowRoot.querySelector(".progress");
     setProgress(getProgressPercent(progressRef) as number);
+
+    // Ensure Midi and Audio have same duration
+    if (!wavesurfer) return;
+    durationRef.current = wavesurfer.getDuration();
+    setProgress(0.1);
   }, [isReady]);
 
   useEffect(() => {
@@ -92,16 +98,20 @@ export default function Preview() {
             setMidiFile(e.target.files[0]);
           }}
         />
-        {midiFile && (
+        {midiFile && progressRef.current && (
           <PianoRoll
             midiFile={midiFile}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
             progress={progress}
+            duration={wavesurfer?.getDuration() as number}
           />
         )}
       </div>
-      <div ref={containerRef} />
+      <div
+        className={isPlaying ? "pointer-events-none" : "cursor-col-resize"}
+        ref={containerRef}
+      />
     </div>
   );
 }

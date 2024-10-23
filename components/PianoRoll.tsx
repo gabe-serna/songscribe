@@ -9,6 +9,7 @@ interface PianoRollProps {
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
   progress: number;
+  duration: number;
 }
 
 interface MidiNote {
@@ -22,13 +23,13 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   isPlaying,
   setIsPlaying,
   progress,
+  duration,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [midiData, setMidiData] = useState<MidiNote[]>([]);
 
   const tempo = useRef(120);
-  const totalDuration = useRef(0);
 
   useEffect(() => {
     // Parse the MIDI file and extract note data from the Blob
@@ -69,14 +70,12 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     if (!ctx) return;
 
     const height = canvas.height;
-    const noteHeight = 10; // Height of each note block
-    totalDuration.current = Math.max(
-      ...notes.map((note) => note.time + note.duration),
-    );
+    const noteHeight = 5; // Height of each note block
     const secondsPerBeat = 60 / tempo.current;
     const eightMeasures = 8 * 4 * secondsPerBeat;
     const timeScale = 1000 / eightMeasures; // Pixels Per Second
-    canvas.width = totalDuration.current * timeScale + 1000;
+    console.log(duration * timeScale + 1000);
+    canvas.width = duration * timeScale + 1000;
 
     ctx.clearRect(0, 0, 1000, height);
 
@@ -95,7 +94,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   const playMidi = () => {
     const synth = new Tone.PolySynth(Tone.AMSynth).toDestination();
     const transport = Tone.getTransport();
-    const startTime = getScrollTime(progress, totalDuration.current);
+    const startTime = getScrollTime(progress, duration);
 
     midiData.forEach((note) => {
       let time = note.time - 0.1 - startTime;
@@ -122,7 +121,6 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       const transport = Tone.getTransport();
       transport.stop();
       transport.cancel();
-      console.log("Transport cancelled");
     }
   }, [isPlaying]);
 
