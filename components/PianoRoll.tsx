@@ -8,6 +8,7 @@ interface PianoRollProps {
   midiFile: Blob; // Accepting the MIDI file as a Blob prop
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
+  progress: number;
 }
 
 interface MidiNote {
@@ -20,11 +21,11 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   midiFile,
   isPlaying,
   setIsPlaying,
+  progress,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [midiData, setMidiData] = useState<MidiNote[]>([]);
-  const [progress, setProgress] = useState(0); // Track progress of MIDI playback
   let tempo: number | null = null;
 
   useEffect(() => {
@@ -109,13 +110,6 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
     transport.start();
     setIsPlaying(true);
-
-    // console.log("Scroll: ", progressRef.current);
-
-    // Update the progress line as the MIDI plays
-    transport.scheduleRepeat(() => {
-      setProgress(transport.seconds);
-    }, 0.01);
   };
 
   // Stop playback
@@ -123,8 +117,13 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     const transport = Tone.getTransport();
     transport.stop();
     setIsPlaying(false);
-    setProgress(0);
   };
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setScrollPercentage(containerRef.current, progress);
+    }
+  }, [progress]);
 
   // Draw the progress line on the piano roll
   // useEffect(() => {
@@ -173,3 +172,26 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 };
 
 export default PianoRoll;
+
+function getScrollPercentage(element: HTMLDivElement) {
+  const scrollLeft = element.scrollLeft;
+  const scrollWidth = element.scrollWidth;
+  const clientWidth = element.clientWidth;
+
+  const scrollPercentage = (scrollLeft / (scrollWidth - clientWidth)) * 100;
+
+  return scrollPercentage;
+}
+
+function setScrollPercentage(
+  element: HTMLDivElement,
+  percentage: number,
+): void {
+  if (percentage < 0) percentage = 0;
+  if (percentage > 100) percentage = 100;
+
+  const scrollableWidth = element.scrollWidth - element.clientWidth;
+  const targetScrollLeft = (percentage / 100) * scrollableWidth;
+
+  element.scrollLeft = targetScrollLeft;
+}

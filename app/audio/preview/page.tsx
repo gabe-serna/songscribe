@@ -10,6 +10,7 @@ export default function Preview() {
   const ref = useRef<HTMLInputElement | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [midiFile, setMidiFile] = useState<File | null>(null);
 
   const { wavesurfer, isReady, currentTime } = useWavesurfer({
@@ -25,6 +26,14 @@ export default function Preview() {
     autoCenter: true,
   });
 
+  wavesurfer?.on("timeupdate", () => {
+    // if i wanted to use progress as a measure of seconds i can use
+    // these methods below
+    // const time = wavesurfer.getCurrentTime() / wavesurfer.getDuration();
+
+    setProgress(getProgressPercent(progressRef) as number);
+  });
+
   // Store Progress Bar Element
   useEffect(() => {
     if (!isReady) return;
@@ -32,11 +41,11 @@ export default function Preview() {
     const shadowRoot = child.shadowRoot;
     if (!shadowRoot) return;
     progressRef.current = shadowRoot.querySelector(".progress");
+    setProgress(getProgressPercent(progressRef) as number);
   }, [isReady]);
 
   useEffect(() => {
     wavesurfer && wavesurfer.playPause();
-    const progress = getProgressPercent(progressRef);
   }, [isPlaying]);
 
   //For testing purposes, load a MIDI file on page load
@@ -74,6 +83,7 @@ export default function Preview() {
             midiFile={midiFile}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
+            progress={progress}
           />
         )}
       </div>
@@ -88,7 +98,7 @@ function getProgressPercent(
   if (progressRef.current) {
     const width = window.getComputedStyle(progressRef.current).width;
     const progress = parseInt(width) / 10;
-    console.log("progress: ", progress, "%");
+    // console.log("progress: ", progress, "%");
     return progress;
   }
 }
