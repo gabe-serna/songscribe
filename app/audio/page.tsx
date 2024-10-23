@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import MidiVisualizer from "@/components/MidiVisualizer";
+import Waveform from "@/components/Waveform";
 
 const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const apiBaseUrl = "http://localhost:8000";
@@ -87,42 +88,42 @@ export default function AudioToMidiForm() {
 
   return (
     <div className="flex w-full flex-col justify-around">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="audio_file"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Upload Audio File</FormLabel>
-                <FormControl>
-                  <Input
-                    type="file"
-                    accept=".mp3, .wav, .ogg, .flac"
-                    onChange={(e) => {
-                      field.onChange(e.target.files);
-                    }}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Upload an audio file to convert to MIDI.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Converting..." : "Submit"}
-          </Button>
-        </form>
-      </Form>
+      {!visualizer && (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="audio_file"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Upload Audio File</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept=".mp3, .wav, .ogg, .flac"
+                      onChange={(e) => {
+                        field.onChange(e.target.files);
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Upload an audio file to convert to MIDI.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Converting..." : "Submit"}
+            </Button>
+          </form>
+        </Form>
+      )}
       {visualizer && (
-        <div>
-          <MidiVisualizer
-            midiBlob={visualizer.midiBlob}
-            audioSrc={visualizer.audioSrc}
-          />
-        </div>
+        <Waveform
+          audioUrl={visualizer.audioSrc}
+          midiFile={visualizer.midiBlob}
+        />
       )}
     </div>
   );
