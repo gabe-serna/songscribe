@@ -53,7 +53,9 @@ export default function Preview() {
     async function loadTempFile() {
       const res = await fetch("/audio/tsubasa_bass.mid");
       const blob = await res.blob();
-      const file = new File([blob], "tsubasa_bass.mid", { type: "audio/midi" });
+      const file = new File([blob], "tsubasa_bass.mid", {
+        type: "audio/midi",
+      });
 
       if (ref.current) {
         const dataTransfer = new DataTransfer();

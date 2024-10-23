@@ -74,7 +74,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     const secondsPerBeat = 60 / tempo! || 120;
     const eightMeasures = 8 * 4 * secondsPerBeat;
     const timeScale = 1000 / eightMeasures; // Pixels Per Second
-    canvas.width = totalDuration * timeScale;
+    canvas.width = totalDuration * timeScale + 1000;
 
     ctx.clearRect(0, 0, 1000, height);
 
@@ -91,21 +91,14 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
   // Play the MIDI file using Tone.js
   const playMidi = () => {
-    const synth = new Tone.Synth().toDestination();
+    const synth = new Tone.PolySynth(Tone.AMSynth).toDestination();
     const transport = Tone.getTransport();
 
-    let previousTime = -1;
     midiData.forEach((note) => {
-      let time = note.time;
-
-      if (time <= previousTime) {
-        time = previousTime + 0.001;
-      }
+      let time = note.time - 0.1;
       transport.schedule((t) => {
         synth.triggerAttackRelease(note.note, note.duration, t);
       }, time);
-
-      previousTime = time; // Update the previous time
     });
 
     transport.start();
@@ -125,41 +118,17 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     }
   }, [progress]);
 
-  // Draw the progress line on the piano roll
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   if (!canvas) return;
-
-  //   const ctx = canvas.getContext("2d");
-  //   if (!ctx) return;
-
-  //   const width = canvas.width;
-  //   const height = canvas.height;
-  //   const totalDuration = Math.max(
-  //     ...midiData.map((note) => note.time + note.duration),
-  //   );
-  //   const timeScale = width / totalDuration;
-
-  //   // Redraw the progress line
-  //   ctx.clearRect(0, 0, width, height);
-  //   drawPianoRoll(midiData); // Redraw the piano roll notes
-
-  //   // Draw progress line
-  //   ctx.strokeStyle = "#d97706"; // Progress line color - yellow-600
-  //   ctx.lineWidth = 2;
-  //   ctx.beginPath();
-  //   ctx.moveTo(progress * timeScale, 0);
-  //   ctx.lineTo(progress * timeScale, height);
-  //   ctx.stroke();
-  // }, [progress, midiData]);
-
   return (
     <div>
-      <div
-        ref={containerRef}
-        className="h-[420px] w-[1000px] overflow-x-scroll"
-      >
-        <canvas ref={canvasRef} width={1000} height={400} />
+      <div className="relative flex h-[420px]">
+        <div
+          ref={containerRef}
+          className="no-scrollbar h-full w-[1000px] overflow-x-scroll"
+        >
+          <canvas ref={canvasRef} width={1000} height={400} />
+        </div>
+
+        {/* <div className="absolute h-full w-16 bg-white" /> */}
       </div>
 
       <div style={{ marginTop: "10px" }}>
@@ -172,16 +141,6 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 };
 
 export default PianoRoll;
-
-function getScrollPercentage(element: HTMLDivElement) {
-  const scrollLeft = element.scrollLeft;
-  const scrollWidth = element.scrollWidth;
-  const clientWidth = element.clientWidth;
-
-  const scrollPercentage = (scrollLeft / (scrollWidth - clientWidth)) * 100;
-
-  return scrollPercentage;
-}
 
 function setScrollPercentage(
   element: HTMLDivElement,
