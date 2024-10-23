@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as Tone from "tone";
 import { Midi } from "@tonejs/midi";
 
@@ -22,8 +22,10 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   setIsPlaying,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [midiData, setMidiData] = useState<MidiNote[]>([]);
   const [progress, setProgress] = useState(0); // Track progress of MIDI playback
+  let tempo: number | null = null;
 
   useEffect(() => {
     // Parse the MIDI file and extract note data from the Blob
@@ -31,10 +33,12 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     reader.onload = async (e) => {
       const arrayBuffer = e.target?.result as ArrayBuffer;
       if (arrayBuffer) {
-        const midi = await Midi.fromUrl(URL.createObjectURL(midiFile)); // Use Tone.Midi with ArrayBuffer
+        const midi = await Midi.fromUrl(URL.createObjectURL(midiFile));
+        // const midi = await Midi.fromUrl("/audio/tsubasa_bass.mid");
 
         // Extract note data
         const notes: MidiNote[] = [];
+        tempo = midi.header.tempos[0].bpm;
         midi.tracks.forEach((track) => {
           track.notes.forEach((note) => {
             notes.push({
@@ -61,15 +65,17 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const width = canvas.width;
     const height = canvas.height;
     const noteHeight = 10; // Height of each note block
     const totalDuration = Math.max(
       ...notes.map((note) => note.time + note.duration),
     );
-    const timeScale = width / totalDuration; // Scale the time to fit canvas width
+    const secondsPerBeat = 60 / tempo! || 120;
+    const eightMeasures = 8 * 4 * secondsPerBeat;
+    const timeScale = 1000 / eightMeasures; // Pixels Per Second
+    canvas.width = totalDuration * timeScale;
 
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, 1000, height);
 
     // Draw each note as a rectangle
     notes.forEach((note) => {
@@ -77,7 +83,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       const y = (Tone.Frequency(note.note).toMidi() - 21) * noteHeight;
       const noteWidth = note.duration * timeScale;
 
-      ctx.fillStyle = "#007bff"; // Note color
+      ctx.fillStyle = "#eab308"; // Note color - yellow-500
       ctx.fillRect(x, height - y - noteHeight, noteWidth, noteHeight); // Draw the note rectangle
     });
   };
@@ -104,6 +110,8 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     transport.start();
     setIsPlaying(true);
 
+    // console.log("Scroll: ", progressRef.current);
+
     // Update the progress line as the MIDI plays
     transport.scheduleRepeat(() => {
       setProgress(transport.seconds);
@@ -119,36 +127,41 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   };
 
   // Draw the progress line on the piano roll
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  // useEffect(() => {
+  //   const canvas = canvasRef.current;
+  //   if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  //   const ctx = canvas.getContext("2d");
+  //   if (!ctx) return;
 
-    const width = canvas.width;
-    const height = canvas.height;
-    const totalDuration = Math.max(
-      ...midiData.map((note) => note.time + note.duration),
-    );
-    const timeScale = width / totalDuration;
+  //   const width = canvas.width;
+  //   const height = canvas.height;
+  //   const totalDuration = Math.max(
+  //     ...midiData.map((note) => note.time + note.duration),
+  //   );
+  //   const timeScale = width / totalDuration;
 
-    // Redraw the progress line
-    ctx.clearRect(0, 0, width, height);
-    drawPianoRoll(midiData); // Redraw the piano roll notes
+  //   // Redraw the progress line
+  //   ctx.clearRect(0, 0, width, height);
+  //   drawPianoRoll(midiData); // Redraw the piano roll notes
 
-    // Draw progress line
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(progress * timeScale, 0);
-    ctx.lineTo(progress * timeScale, height);
-    ctx.stroke();
-  }, [progress, midiData]);
+  //   // Draw progress line
+  //   ctx.strokeStyle = "#d97706"; // Progress line color - yellow-600
+  //   ctx.lineWidth = 2;
+  //   ctx.beginPath();
+  //   ctx.moveTo(progress * timeScale, 0);
+  //   ctx.lineTo(progress * timeScale, height);
+  //   ctx.stroke();
+  // }, [progress, midiData]);
 
   return (
     <div>
-      <canvas ref={canvasRef} width={800} height={400} />
+      <div
+        ref={containerRef}
+        className="h-[420px] w-[1000px] overflow-x-scroll"
+      >
+        <canvas ref={canvasRef} width={1000} height={400} />
+      </div>
 
       <div style={{ marginTop: "10px" }}>
         <button onClick={isPlaying ? stopMidi : playMidi}>

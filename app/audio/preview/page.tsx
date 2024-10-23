@@ -2,11 +2,13 @@
 
 import PianoRoll from "@/components/PianoRoll";
 import { useWavesurfer } from "@wavesurfer/react";
-import { useEffect, useRef, useState } from "react";
-import MinimapPlugin from "wavesurfer.js/dist/plugins/minimap";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function Preview() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const progressRef = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLInputElement | null>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [midiFile, setMidiFile] = useState<File | null>(null);
 
@@ -21,46 +23,45 @@ export default function Preview() {
     barRadius: 5,
     autoScroll: true,
     autoCenter: true,
-    minPxPerSec: 100,
-    // plugins: [
-    //   // Register the plugin
-    //   MinimapPlugin.create({
-    //     height: 20,
-    //     waveColor: "#ddd",
-    //     progressColor: "#999",
-    //     // the Minimap takes all the same options as the WaveSurfer itself
-    //   }),
-    // ],
   });
 
+  // Store Progress Bar Element
   useEffect(() => {
-    if (wavesurfer && isReady) {
-      wavesurfer.registerPlugin(
-        MinimapPlugin.create({
-          height: 50,
-          waveColor: "#666",
-          progressColor: "#444",
-          barWidth: 4,
-          barHeight: 5,
-          barRadius: 5,
-        }),
-      );
-    }
-  }, [isReady, wavesurfer]);
+    if (!isReady) return;
+    const child = containerRef.current?.childNodes[0] as HTMLDivElement;
+    const shadowRoot = child.shadowRoot;
+    if (!shadowRoot) return;
+    progressRef.current = shadowRoot.querySelector(".progress");
+  }, [isReady]);
 
   useEffect(() => {
     wavesurfer && wavesurfer.playPause();
+    const progress = getProgressPercent(progressRef);
   }, [isPlaying]);
+
+  //For testing purposes, load a MIDI file on page load
+  useEffect(() => {
+    async function loadTempFile() {
+      const res = await fetch("/audio/tsubasa_bass.mid");
+      const blob = await res.blob();
+      const file = new File([blob], "tsubasa_bass.mid", { type: "audio/midi" });
+
+      if (ref.current) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        ref.current.files = dataTransfer.files;
+        setMidiFile(dataTransfer.files[0]);
+      }
+    }
+
+    loadTempFile();
+  }, []);
 
   return (
     <div className="flex h-full w-[1000px] flex-col justify-center">
-      <div ref={containerRef} />
-
-      <button onClick={() => setIsPlaying(!isPlaying)}>
-        {isPlaying ? "Pause" : "Play"}
-      </button>
       <div>
         <input
+          ref={ref}
           type="file"
           accept=".mid"
           onChange={(e) => {
@@ -76,6 +77,18 @@ export default function Preview() {
           />
         )}
       </div>
+      <div ref={containerRef} />
     </div>
   );
+}
+
+function getProgressPercent(
+  progressRef: React.MutableRefObject<HTMLDivElement | null>,
+) {
+  if (progressRef.current) {
+    const width = window.getComputedStyle(progressRef.current).width;
+    const progress = parseInt(width) / 10;
+    console.log("progress: ", progress, "%");
+    return progress;
+  }
 }
