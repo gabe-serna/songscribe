@@ -74,7 +74,6 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     const secondsPerBeat = 60 / tempo.current;
     const eightMeasures = 8 * 4 * secondsPerBeat;
     const timeScale = 1000 / eightMeasures; // Pixels Per Second
-    console.log(duration * timeScale + 1000);
     canvas.width = duration * timeScale + 1000;
 
     ctx.clearRect(0, 0, 1000, height);

@@ -5,10 +5,10 @@ import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 
 export default function Waveform({
-  audioUrl,
+  audioBlob,
   midiFile,
 }: {
-  audioUrl: string;
+  audioBlob: Blob;
   midiFile: Blob;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -18,10 +18,24 @@ export default function Waveform({
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (audioBlob) {
+      const objectURL = URL.createObjectURL(audioBlob);
+      setUrl(objectURL);
+      console.log("objectURL: ", objectURL);
+      wavesurfer?.load(objectURL);
+
+      return () => {
+        URL.revokeObjectURL(objectURL);
+      };
+    }
+  }, [audioBlob]);
 
   const { wavesurfer, isReady, currentTime } = useWavesurfer({
     container: containerRef,
-    url: audioUrl,
+    url: url || "",
     waveColor: "#44403c", //stone-700
     progressColor: "#292524", //stone-800
     height: 100,
