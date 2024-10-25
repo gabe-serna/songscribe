@@ -5,9 +5,11 @@ import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 
 export default function Waveform({
+  name,
   audioBlob,
   midiFile,
 }: {
+  name: string;
   audioBlob: Blob;
   midiFile: Blob;
 }) {
@@ -86,6 +88,7 @@ export default function Waveform({
 
   return (
     <div className="flex h-full w-[1000px] flex-col justify-center">
+      <h1 className="text-xl"> {name} </h1>
       <div>
         {progressRef.current && (
           <PianoRoll

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form";
 import Waveform from "@/components/Waveform";
 import JSZip from "jszip";
+import MergeMidiButton from "@/components/MergeMidiButton";
 
 const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const apiBaseUrl = "http://localhost:8000";
@@ -43,13 +44,13 @@ const formSchema = z.object({
 
 type Tracks = "vocals" | "drums" | "guitar" | "bass" | "piano" | "others";
 
-interface Stem {
+export interface Stem {
   name: Tracks;
   audioBlob: Blob;
   midiBlob: Blob | null;
 }
 
-interface AudioStorage {
+export interface AudioStorage {
   vocals: Stem;
   drums: Stem;
   guitar: Stem;
@@ -95,7 +96,7 @@ export default function AudioToMidiForm() {
         separation_mode = "Vocals & Instrumental (Low Quality, Faster)";
     }
     formData.append("separation_mode", separation_mode as string);
-    formData.append("end_time", `${10}`);
+    formData.append("end_time", `${45}`);
 
     try {
       setIsSubmitting(true);
@@ -280,12 +281,14 @@ export default function AudioToMidiForm() {
             return (
               <Waveform
                 key={key}
+                name={stem.name}
                 audioBlob={stem.audioBlob}
                 midiFile={stem.midiBlob}
               />
             );
           },
         )}
+      {audioStorage && <MergeMidiButton audioStorage={audioStorage} />}
     </div>
   );
 }
