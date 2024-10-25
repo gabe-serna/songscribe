@@ -2,6 +2,7 @@ import { Midi } from "@tonejs/midi";
 
 export default async function mergeMidi(midiFiles: Array<ArrayBuffer>) {
   const combinedMidi = new Midi();
+  let currentChannel = 0;
 
   for (const file of midiFiles) {
     const midi = new Midi(file);
@@ -11,9 +12,11 @@ export default async function mergeMidi(midiFiles: Array<ArrayBuffer>) {
 
       newTrack.instrument = track.instrument;
       newTrack.name = track.name;
-      newTrack.channel = track.channel;
+      newTrack.channel = currentChannel;
       newTrack.notes = [...track.notes];
       newTrack.controlChanges = { ...track.controlChanges };
+
+      currentChannel++;
     });
   }
 
