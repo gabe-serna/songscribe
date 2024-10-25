@@ -1,8 +1,15 @@
 import { Midi } from "@tonejs/midi";
 
-export default async function mergeMidi(midiFiles: Array<ArrayBuffer>) {
+export default async function mergeMidi(
+  midiFiles: Array<ArrayBuffer>,
+  tempo: number,
+): Promise<ArrayBuffer> {
   const combinedMidi = new Midi();
   let currentChannel = 0;
+
+  // combinedMidi.header.keySignatures = [];
+  // const bps = Math.round(60000000 / tempo);
+  combinedMidi.header.setTempo(tempo);
 
   for (const file of midiFiles) {
     const midi = new Midi(file);

@@ -18,6 +18,7 @@ import {
 import Waveform from "@/components/Waveform";
 import JSZip from "jszip";
 import MergeMidiButton from "@/components/MergeMidiButton";
+import getTempo from "@/utils/getTempo";
 
 const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const apiBaseUrl = "http://localhost:8000";
@@ -62,6 +63,7 @@ export interface AudioStorage {
 export default function AudioToMidiForm() {
   const [audioStorage, setAudioStorage] = useState<AudioStorage | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const tempo = useRef(120);
   const lastRun = useRef(Date.now());
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -77,6 +79,10 @@ export default function AudioToMidiForm() {
     const file = fileList[0];
     if (!file) return;
 
+    getTempo(file).then((bpm) => {
+      console.log("Tempo: ", bpm);
+      tempo.current = bpm;
+    });
     const formData = new FormData();
     formData.append("audio_file", file);
 
@@ -96,7 +102,7 @@ export default function AudioToMidiForm() {
         separation_mode = "Vocals & Instrumental (Low Quality, Faster)";
     }
     formData.append("separation_mode", separation_mode as string);
-    formData.append("end_time", `${45}`);
+    formData.append("end_time", `${30}`);
 
     try {
       setIsSubmitting(true);
@@ -138,6 +144,7 @@ export default function AudioToMidiForm() {
     async function convertToMidi(stem: Stem): Promise<Blob> {
       const formData = new FormData();
       formData.append("audio_file", stem.audioBlob);
+      formData.append("tempo", `${tempo.current}`);
 
       const response = await fetch(`${apiBaseUrl}/audio-to-midi`, {
         method: "POST",
@@ -167,15 +174,7 @@ export default function AudioToMidiForm() {
       console.log("Converting to MIDI", needsMidi);
 
       const needMidiSingle = needsMidi.shift();
-      // Run all the conversions in parallel and wait for them to complete
-      // const midiResults = await Promise.all(
-      //   needsMidi.map((stem, i) =>
-      //     convertToMidi(stem).then((midiBlob) => {
-      //       const name = names[i] as Tracks;
-      //       return { name, midiBlob };
-      //     }),
-      //   ),
-      // );
+
       const midiResults = await convertToMidi(needMidiSingle!).then(
         (midiBlob) => {
           return {
@@ -194,12 +193,6 @@ export default function AudioToMidiForm() {
           ...updatedStorage[name],
           midiBlob: midiResults.midiBlob,
         };
-        // midiResults.forEach(({ name, midiBlob }) => {
-        //   updatedStorage[name] = {
-        //     ...updatedStorage[name],
-        //     midiBlob,
-        //   };
-        // });
 
         return updatedStorage;
       });
@@ -288,7 +281,9 @@ export default function AudioToMidiForm() {
             );
           },
         )}
-      {audioStorage && <MergeMidiButton audioStorage={audioStorage} />}
+      {audioStorage && (
+        <MergeMidiButton tempo={tempo.current} audioStorage={audioStorage} />
+      )}
     </div>
   );
 }

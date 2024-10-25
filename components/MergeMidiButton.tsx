@@ -5,11 +5,12 @@ import { Button } from "./ui/button";
 import mergeMidi from "@/utils/mergeMidi";
 import { useRef, useState } from "react";
 
-export default function MergeMidiButton({
-  audioStorage,
-}: {
+interface Props {
   audioStorage: AudioStorage | null;
-}) {
+  tempo: number;
+}
+
+export default function MergeMidiButton({ audioStorage, tempo }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const message = useRef<String | null>(null);
 
@@ -31,7 +32,7 @@ export default function MergeMidiButton({
         ),
       );
 
-      const songMidi = await mergeMidi(midiFiles);
+      const songMidi = await mergeMidi(midiFiles, tempo);
       const blob = new Blob([songMidi], { type: "application/octet-stream" });
       const url = URL.createObjectURL(blob);
 
