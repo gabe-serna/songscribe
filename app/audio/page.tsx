@@ -43,7 +43,14 @@ const formSchema = z.object({
   separation_mode: z.enum(["solo", "duet", "small_band", "full_band"]),
 });
 
-type Tracks = "vocals" | "drums" | "guitar" | "bass" | "piano" | "others";
+type Tracks =
+  | "vocals"
+  | "no_vocals"
+  | "drums"
+  | "guitar"
+  | "bass"
+  | "piano"
+  | "others";
 
 export interface Stem {
   name: Tracks;
@@ -53,6 +60,7 @@ export interface Stem {
 
 export interface AudioStorage {
   vocals: Stem;
+  no_vocals: Stem;
   drums: Stem;
   guitar: Stem;
   bass: Stem;
@@ -63,6 +71,7 @@ export interface AudioStorage {
 export default function AudioToMidiForm() {
   const [audioStorage, setAudioStorage] = useState<AudioStorage | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const songName = useRef("");
   const tempo = useRef(120);
   const lastRun = useRef(Date.now());
 
@@ -76,13 +85,14 @@ export default function AudioToMidiForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const fileList = values.audio_file;
-    const file = fileList[0];
+    const file = fileList[0] as File;
     if (!file) return;
 
     getTempo(file).then((bpm) => {
-      console.log("Tempo: ", bpm);
       tempo.current = Math.round(bpm);
+      songName.current = file.name.split(".")[0];
     });
+
     const formData = new FormData();
     formData.append("audio_file", file);
 
@@ -102,8 +112,8 @@ export default function AudioToMidiForm() {
         separation_mode = "Vocals & Instrumental (Low Quality, Faster)";
     }
     formData.append("separation_mode", separation_mode as string);
-    formData.append("start_time", `${2}`);
-    formData.append("end_time", `${20}`);
+    formData.append("start_time", `${28}`);
+    formData.append("end_time", `${38}`);
 
     try {
       setIsSubmitting(true);
@@ -157,13 +167,15 @@ export default function AudioToMidiForm() {
         console.error(response.body);
       }
       const midiBlob = await response.blob();
-      const url = URL.createObjectURL(midiBlob);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${stem.name}.mid`;
-      a.click();
-      URL.revokeObjectURL(url);
+      // Optional: Download the MIDI file
+      // const url = URL.createObjectURL(midiBlob);
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = `${stem.name}.mid`;
+      // a.click();
+      // URL.revokeObjectURL(url);
+
       return midiBlob;
     }
 
@@ -278,7 +290,6 @@ export default function AudioToMidiForm() {
         Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
           ([key, stem]) => {
             if (!stem.midiBlob) return;
-            console.log("audioStorage: ", audioStorage);
             return (
               <Waveform
                 key={key}
@@ -290,7 +301,11 @@ export default function AudioToMidiForm() {
           },
         )}
       {audioStorage && (
-        <MergeMidiButton tempo={tempo.current} audioStorage={audioStorage} />
+        <MergeMidiButton
+          tempo={tempo.current}
+          audioStorage={audioStorage}
+          songName={songName.current}
+        />
       )}
     </div>
   );

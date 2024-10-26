@@ -14,13 +14,14 @@ interface Track {
   header: Header;
   trackNumber: number;
   instrument: string;
+  channel: number;
   name: string;
-  notes: Note[];
-  controlChanges: ControlChanges; // Adjust the type as needed
+  // notes: Note[];
+  // controlChanges: ControlChanges;
 }
 
 export default function MidiUploader() {
-  const [metadata, setMetadata] = useState<Track | null>(null);
+  const [metadata, setMetadata] = useState<Track[] | null>(null);
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
@@ -35,17 +36,18 @@ export default function MidiUploader() {
         header: header,
         trackNumber: index + 1,
         instrument: track.instrument.name,
+        channel: track.channel,
         name: track.name,
-        notes: track.notes.map((note) => ({
-          name: note.name,
-          time: note.time,
-          duration: note.duration,
-          velocity: note.velocity,
-        })),
-        controlChanges: track.controlChanges,
+        // notes: track.notes.map((note) => ({
+        //   name: note.name,
+        //   time: note.time,
+        //   duration: note.duration,
+        //   velocity: note.velocity,
+        // })),
+        // controlChanges: track.controlChanges,
       }));
 
-      setMetadata(parsedMetadata[0]);
+      setMetadata(parsedMetadata);
     }
   };
 

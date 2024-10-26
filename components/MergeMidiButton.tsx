@@ -8,14 +8,20 @@ import { useRef, useState } from "react";
 interface Props {
   audioStorage: AudioStorage | null;
   tempo: number;
+  songName: string;
 }
 
-export default function MergeMidiButton({ audioStorage, tempo }: Props) {
+export default function MergeMidiButton({
+  audioStorage,
+  tempo,
+  songName,
+}: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const message = useRef<String | null>(null);
 
   const merge = async () => {
     setIsSubmitting(true);
+    message.current = null;
     if (!audioStorage) {
       message.current = "No audio tracks to merge.";
       setIsSubmitting(false);
@@ -23,6 +29,9 @@ export default function MergeMidiButton({ audioStorage, tempo }: Props) {
     }
 
     try {
+      const names = Object.keys(audioStorage);
+      console.log("names", names);
+
       const midiFiles = await Promise.all(
         Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
           async ([_, stem]) => {
@@ -32,7 +41,7 @@ export default function MergeMidiButton({ audioStorage, tempo }: Props) {
         ),
       );
 
-      const songMidi = await mergeMidi(midiFiles, tempo);
+      const songMidi = await mergeMidi(midiFiles, tempo, names, songName);
       const blob = new Blob([songMidi], { type: "application/octet-stream" });
       const url = URL.createObjectURL(blob);
 
