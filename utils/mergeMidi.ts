@@ -35,17 +35,7 @@ export default async function mergeMidi(
       });
 
       // Adjust the control changes
-      Object.keys(track.controlChanges).forEach((ccNumber) => {
-        const controlEvents = track.controlChanges[ccNumber];
-        controlEvents.forEach((ccEvent) => {
-          newTrack.addCC({
-            number: ccEvent.number,
-            value: ccEvent.value,
-            time: ccEvent.time * scaleFactor,
-          });
-        });
-      });
-
+      track.controlChanges = track.controlChanges;
       currentChannel++;
     });
   }
