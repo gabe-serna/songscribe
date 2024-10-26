@@ -4,6 +4,7 @@ import { AudioStorage, Stem } from "@/app/audio/page";
 import { Button } from "./ui/button";
 import mergeMidi from "@/utils/mergeMidi";
 import { useRef, useState } from "react";
+import { createScore } from "@/utils/flat";
 
 interface Props {
   audioStorage: AudioStorage | null;
@@ -43,13 +44,16 @@ export default function MergeMidiButton({
 
       const songMidi = await mergeMidi(midiFiles, tempo, names, songName);
       const blob = new Blob([songMidi], { type: "application/octet-stream" });
-      const url = URL.createObjectURL(blob);
+      // const url = URL.createObjectURL(blob);
+      console.log("creating flat score...");
+      const response = await createScore(blob, songName);
+      console.log("flat.io response: ", response);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "TranscribedSong.mid";
-      a.click();
-      URL.revokeObjectURL(url);
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = "TranscribedSong.mid";
+      // a.click();
+      // URL.revokeObjectURL(url);
     } catch (error) {
       message.current = "Failed to merge midi files.";
       console.error(error);
