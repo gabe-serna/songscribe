@@ -10,12 +10,14 @@ interface Props {
   audioStorage: AudioStorage | null;
   tempo: number;
   songName: string;
+  setFlatScore: (score: string) => void;
 }
 
 export default function MergeMidiButton({
   audioStorage,
   tempo,
   songName,
+  setFlatScore,
 }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const message = useRef<String | null>(null);
@@ -48,6 +50,7 @@ export default function MergeMidiButton({
       console.log("creating flat score...");
       const response = await createScore(blob, songName);
       console.log("flat.io response: ", response);
+      setFlatScore(response.id);
 
       // const a = document.createElement("a");
       // a.href = url;

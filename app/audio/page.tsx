@@ -19,6 +19,7 @@ import Waveform from "@/components/Waveform";
 import JSZip from "jszip";
 import MergeMidiButton from "@/components/MergeMidiButton";
 import getTempo from "@/utils/getTempo";
+import Embed from "flat-embed";
 
 const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const apiBaseUrl = "http://localhost:8000";
@@ -71,6 +72,8 @@ export interface AudioStorage {
 export default function AudioToMidiForm() {
   const [audioStorage, setAudioStorage] = useState<AudioStorage | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [flatScore, setFlatScore] = useState<string | null>(null);
+  const flatRef = useRef<HTMLDivElement>(null);
   const songName = useRef("");
   const tempo = useRef(120);
   const lastRun = useRef(Date.now());
@@ -112,8 +115,8 @@ export default function AudioToMidiForm() {
         separation_mode = "Vocals & Instrumental (Low Quality, Faster)";
     }
     formData.append("separation_mode", separation_mode as string);
-    formData.append("start_time", `${28}`);
-    formData.append("end_time", `${38}`);
+    formData.append("start_time", `${30}`);
+    formData.append("end_time", `${45}`);
 
     try {
       setIsSubmitting(true);
@@ -227,6 +230,19 @@ export default function AudioToMidiForm() {
     handleMidiConversion();
   }, [audioStorage]);
 
+  useEffect(() => {
+    const container = flatRef.current;
+    if (!container || !flatScore) return;
+    console.log("Creating Flat.io embed");
+    new Embed(container, {
+      score: flatScore,
+      embedParams: {
+        appId: process.env.NEXT_PUBLIC_FLAT_APP_ID,
+        controlsPosition: "bottom",
+      },
+    });
+  }, [flatScore]);
+
   return (
     <div className="flex w-full flex-col justify-around">
       {!audioStorage && (
@@ -305,8 +321,10 @@ export default function AudioToMidiForm() {
           tempo={tempo.current}
           audioStorage={audioStorage}
           songName={songName.current}
+          setFlatScore={setFlatScore}
         />
       )}
+      {flatScore && <div ref={flatRef} className="h-[75vh] w-full" />}
     </div>
   );
 }

@@ -12,7 +12,7 @@ export async function createScore(midiFile: Blob, title: string) {
       body: JSON.stringify({
         title: title,
         filename: `${title}.mid`,
-        privacy: "private",
+        privacy: "public",
         data: base64Data,
         dataEncoding: "base64",
       }),
