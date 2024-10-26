@@ -81,7 +81,7 @@ export default function AudioToMidiForm() {
 
     getTempo(file).then((bpm) => {
       console.log("Tempo: ", bpm);
-      tempo.current = bpm;
+      tempo.current = Math.round(bpm);
     });
     const formData = new FormData();
     formData.append("audio_file", file);
@@ -102,7 +102,8 @@ export default function AudioToMidiForm() {
         separation_mode = "Vocals & Instrumental (Low Quality, Faster)";
     }
     formData.append("separation_mode", separation_mode as string);
-    formData.append("end_time", `${30}`);
+    formData.append("start_time", `${2}`);
+    formData.append("end_time", `${20}`);
 
     try {
       setIsSubmitting(true);
@@ -156,6 +157,13 @@ export default function AudioToMidiForm() {
         console.error(response.body);
       }
       const midiBlob = await response.blob();
+      const url = URL.createObjectURL(midiBlob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${stem.name}.mid`;
+      a.click();
+      URL.revokeObjectURL(url);
       return midiBlob;
     }
 
