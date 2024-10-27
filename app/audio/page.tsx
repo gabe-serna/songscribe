@@ -19,7 +19,7 @@ import Waveform from "@/components/Waveform";
 import JSZip from "jszip";
 import MergeMidiButton from "@/components/MergeMidiButton";
 import getTempo from "@/utils/getTempo";
-import Embed from "flat-embed";
+import { AudioStorage, Stem, Tracks } from "@/utils/types";
 
 const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const apiBaseUrl = "http://localhost:8000";
@@ -43,31 +43,6 @@ const formSchema = z.object({
     ),
   separation_mode: z.enum(["solo", "duet", "small_band", "full_band"]),
 });
-
-type Tracks =
-  | "vocals"
-  | "no_vocals"
-  | "drums"
-  | "guitar"
-  | "bass"
-  | "piano"
-  | "others";
-
-export interface Stem {
-  name: Tracks;
-  audioBlob: Blob;
-  midiBlob: Blob | null;
-}
-
-export interface AudioStorage {
-  vocals: Stem;
-  no_vocals: Stem;
-  drums: Stem;
-  guitar: Stem;
-  bass: Stem;
-  piano: Stem;
-  others: Stem;
-}
 
 export default function AudioToMidiForm() {
   const [audioStorage, setAudioStorage] = useState<AudioStorage | null>(null);
@@ -234,13 +209,19 @@ export default function AudioToMidiForm() {
     const container = flatRef.current;
     if (!container || !flatScore) return;
     console.log("Creating Flat.io embed");
-    new Embed(container, {
-      score: flatScore,
-      embedParams: {
-        appId: process.env.NEXT_PUBLIC_FLAT_APP_ID,
-        controlsPosition: "bottom",
-      },
-    });
+    import("flat-embed")
+      .then(({ default: Embed }) => {
+        new Embed(container, {
+          score: flatScore,
+          embedParams: {
+            appId: process.env.NEXT_PUBLIC_FLAT_APP_ID,
+            controlsPosition: "bottom",
+          },
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to load flat-embed:", error);
+      });
   }, [flatScore]);
 
   return (

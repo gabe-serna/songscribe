@@ -1,10 +1,10 @@
 "use client";
 
-import { AudioStorage, Stem } from "@/app/audio/page";
 import { Button } from "./ui/button";
 import mergeMidi from "@/utils/mergeMidi";
 import { useRef, useState } from "react";
 import { createScore } from "@/utils/flat";
+import { AudioStorage, Stem } from "@/utils/types";
 
 interface Props {
   audioStorage: AudioStorage | null;
