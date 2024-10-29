@@ -66,10 +66,10 @@ export default function AudioToMidiForm() {
     const file = fileList[0] as File;
     if (!file) return;
 
-    getTempo(file).then((bpm) => {
-      tempo.current = Math.round(bpm);
-      songName.current = file.name.split(".")[0];
-    });
+    const bpm = await getTempo(file);
+    tempo.current = Math.round(bpm);
+    songName.current = file.name.split(".")[0];
+    console.log("tempo: ", tempo.current);
 
     const formData = new FormData();
     formData.append("audio_file", file);
@@ -90,8 +90,9 @@ export default function AudioToMidiForm() {
         separation_mode = "Vocals & Instrumental (Low Quality, Faster)";
     }
     formData.append("separation_mode", separation_mode as string);
-    formData.append("start_time", `${30}`);
-    formData.append("end_time", `${45}`);
+    formData.append("tempo", `${tempo.current}`);
+    formData.append("start_time", `${28}`);
+    formData.append("end_time", `${71}`);
 
     try {
       setIsSubmitting(true);
@@ -134,6 +135,7 @@ export default function AudioToMidiForm() {
       const formData = new FormData();
       formData.append("audio_file", stem.audioBlob);
       formData.append("tempo", `${tempo.current}`);
+      if (stem.name === "drums") formData.append("percussion", "true");
 
       const response = await fetch(`${apiBaseUrl}/audio-to-midi`, {
         method: "POST",
@@ -146,13 +148,13 @@ export default function AudioToMidiForm() {
       }
       const midiBlob = await response.blob();
 
-      // Optional: Download the MIDI file
-      // const url = URL.createObjectURL(midiBlob);
-      // const a = document.createElement("a");
-      // a.href = url;
-      // a.download = `${stem.name}.mid`;
-      // a.click();
-      // URL.revokeObjectURL(url);
+      // **Optional: Download the MIDI file**
+      const url = URL.createObjectURL(midiBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${stem.name}.mid`;
+      a.click();
+      URL.revokeObjectURL(url);
 
       return midiBlob;
     }
@@ -199,7 +201,7 @@ export default function AudioToMidiForm() {
     if (!audioStorage) return;
 
     // Temporarily throttle the conversion to once per second
-    if (Date.now() - lastRun.current < 1000) return;
+    if (Date.now() - lastRun.current < 2000) return;
     lastRun.current = Date.now();
 
     handleMidiConversion();

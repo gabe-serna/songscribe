@@ -96,7 +96,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     const startTime = getScrollTime(progress, duration);
 
     midiData.forEach((note) => {
-      let time = note.time - 0.1 - startTime;
+      let time = note.time - startTime;
       transport.schedule((t) => {
         synth.triggerAttackRelease(note.note, note.duration, t);
       }, time);

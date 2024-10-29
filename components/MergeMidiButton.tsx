@@ -46,17 +46,18 @@ export default function MergeMidiButton({
 
       const songMidi = await mergeMidi(midiFiles, tempo, names, songName);
       const blob = new Blob([songMidi], { type: "application/octet-stream" });
-      // const url = URL.createObjectURL(blob);
       console.log("creating flat score...");
       const response = await createScore(blob, songName);
       console.log("flat.io response: ", response);
       setFlatScore(response.id);
 
-      // const a = document.createElement("a");
-      // a.href = url;
-      // a.download = "TranscribedSong.mid";
-      // a.click();
-      // URL.revokeObjectURL(url);
+      // **For Testing: Download the merged MIDI file**
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "TranscribedSong.mid";
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (error) {
       message.current = "Failed to merge midi files.";
       console.error(error);
