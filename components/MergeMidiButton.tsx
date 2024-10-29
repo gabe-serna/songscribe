@@ -52,12 +52,12 @@ export default function MergeMidiButton({
       setFlatScore(response.id);
 
       // **For Testing: Download the merged MIDI file**
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "TranscribedSong.mid";
-      a.click();
-      URL.revokeObjectURL(url);
+      // const url = URL.createObjectURL(blob);
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = "TranscribedSong.mid";
+      // a.click();
+      // URL.revokeObjectURL(url);
     } catch (error) {
       message.current = "Failed to merge midi files.";
       console.error(error);

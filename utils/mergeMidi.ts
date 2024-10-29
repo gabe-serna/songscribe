@@ -63,7 +63,6 @@ export default async function mergeMidi(
 ): Promise<ArrayBuffer> {
   const combinedMidi = new Midi();
   let currentChannel = 0;
-  console.log("num of tracks", midiFiles.length);
 
   combinedMidi.header.timeSignatures = [
     {
@@ -84,8 +83,7 @@ export default async function mergeMidi(
   for (const file of midiFiles) {
     const midi = new Midi(file);
 
-    const track = midi.tracks[0];
-    if (track) {
+    for (const track of midi.tracks) {
       const newTrack = combinedMidi.addTrack();
       const name = names[i] as Stem;
       const instrument = instrumentMap[name];
@@ -106,8 +104,8 @@ export default async function mergeMidi(
       });
 
       newTrack.controlChanges = track.controlChanges;
-      currentChannel++;
     }
+    currentChannel++;
     i++;
   }
 
