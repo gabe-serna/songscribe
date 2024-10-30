@@ -1,133 +1,21 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Waveform from "@/components/Waveform";
-import JSZip from "jszip";
 import MergeMidiButton from "@/components/MergeMidiButton";
-import getTempo from "@/utils/getTempo";
 import { AudioStorage, Stem, Tracks } from "@/utils/types";
+import { AudioContext } from "./AudioProvider";
+import AudioForm from "./AudioForm";
 
-const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const apiBaseUrl = "http://localhost:8000";
 
-const formSchema = z.object({
-  audio_file: z
-    .any()
-    .refine((fileList) => fileList && fileList.length > 0, {
-      message: "Please upload a valid file.",
-    })
-    .refine(
-      (fileList) => {
-        if (!fileList || fileList.length === 0) return false;
-        const file = fileList[0];
-        return validMimeTypes.includes(file.type);
-      },
-      {
-        message:
-          "Invalid file type. Only MP3, WAV, OGG, or FLAC files are allowed.",
-      },
-    ),
-  separation_mode: z.enum(["solo", "duet", "small_band", "full_band"]),
-});
-
-export default function AudioToMidiForm() {
-  const [audioStorage, setAudioStorage] = useState<AudioStorage | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export default function Page() {
+  const { audioStorage, setAudioStorage, tempo, songName } =
+    useContext(AudioContext);
   const [flatScore, setFlatScore] = useState<string | null>(null);
+  const [isMidiComplete, setIsMidiComplete] = useState(false);
   const flatRef = useRef<HTMLDivElement>(null);
-  const songName = useRef("");
-  const tempo = useRef(120);
   const lastRun = useRef(Date.now());
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      audio_file: null,
-      separation_mode: "solo",
-    },
-  });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const fileList = values.audio_file;
-    const file = fileList[0] as File;
-    if (!file) return;
-
-    const bpm = await getTempo(file);
-    tempo.current = Math.round(bpm);
-    songName.current = file.name.split(".")[0];
-    console.log("tempo: ", tempo.current);
-
-    const formData = new FormData();
-    formData.append("audio_file", file);
-
-    let separation_mode: String;
-    switch (values.separation_mode) {
-      case "duet":
-        separation_mode = "Vocals & Instrumental (High Quality, Slower)";
-        break;
-      case "small_band":
-        separation_mode = "Vocals, Drums, Bass & Other (Slower)";
-        break;
-      case "full_band":
-        separation_mode = "Vocal, Drums, Bass, Guitar, Piano & Other (Slowest)";
-        break;
-      case "solo":
-      default:
-        separation_mode = "Vocals & Instrumental (Low Quality, Faster)";
-    }
-    formData.append("separation_mode", separation_mode as string);
-    formData.append("tempo", `${tempo.current}`);
-    formData.append("start_time", `${28}`);
-    formData.append("end_time", `${71}`);
-
-    try {
-      setIsSubmitting(true);
-      const response = await fetch(`${apiBaseUrl}/split-audio`, {
-        method: "POST",
-        mode: "cors",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to isolate audio");
-      }
-
-      JSZip.loadAsync(response.blob()).then((zip) => {
-        zip.forEach((relativePath, file) => {
-          file.async("blob").then((blob) => {
-            const name = relativePath.split(".")[0];
-            setAudioStorage(
-              (prev) =>
-                ({
-                  ...prev,
-                  [name]: { name, audioBlob: blob, midiBlob: null },
-                }) as AudioStorage,
-            );
-          });
-        });
-      });
-      console.log("Audio isolated successfully");
-    } catch (error) {
-      console.error(error);
-      alert("Error converting isolating audio");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
 
   // Convert to Midi
   useEffect(() => {
@@ -149,12 +37,12 @@ export default function AudioToMidiForm() {
       const midiBlob = await response.blob();
 
       // **Optional: Download the MIDI file**
-      const url = URL.createObjectURL(midiBlob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${stem.name}.mid`;
-      a.click();
-      URL.revokeObjectURL(url);
+      // const url = URL.createObjectURL(midiBlob);
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = `${stem.name}.mid`;
+      // a.click();
+      // URL.revokeObjectURL(url);
 
       return midiBlob;
     }
@@ -170,7 +58,10 @@ export default function AudioToMidiForm() {
         needsMidi.push(stem);
       });
 
-      if (needsMidi.length === 0) return;
+      if (needsMidi.length === 0) {
+        setIsMidiComplete(true);
+        return;
+      }
       console.log("Converting to MIDI", needsMidi);
 
       const needMidiSingle = needsMidi.shift();
@@ -201,12 +92,13 @@ export default function AudioToMidiForm() {
     if (!audioStorage) return;
 
     // Temporarily throttle the conversion to once per second
-    if (Date.now() - lastRun.current < 2000) return;
+    if (Date.now() - lastRun.current < 1000) return;
     lastRun.current = Date.now();
 
     handleMidiConversion();
   }, [audioStorage]);
 
+  // Get Flat Score
   useEffect(() => {
     const container = flatRef.current;
     if (!container || !flatScore) return;
@@ -228,63 +120,7 @@ export default function AudioToMidiForm() {
 
   return (
     <div className="flex w-full flex-col justify-around">
-      {!audioStorage && (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="audio_file"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Upload Audio File</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept=".mp3, .wav, .ogg, .flac"
-                      onChange={(e) => {
-                        field.onChange(e.target.files);
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Upload an audio file to convert to MIDI.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="separation_mode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Separation Mode</FormLabel>
-                  <FormControl>
-                    <select
-                      onChange={(e) => {
-                        field.onChange(e.target.value);
-                      }}
-                      className="w-full"
-                    >
-                      <option value="solo">Solo</option>
-                      <option value="duet">Duet</option>
-                      <option value="small_band">Small Band</option>
-                      <option value="full_band">Full Band</option>
-                    </select>
-                  </FormControl>
-                  <FormDescription>
-                    Select the separation mode for the audio file.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Converting..." : "Submit"}
-            </Button>
-          </form>
-        </Form>
-      )}
+      {!audioStorage && <AudioForm />}
       {audioStorage &&
         Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
           ([key, stem]) => {
@@ -299,7 +135,7 @@ export default function AudioToMidiForm() {
             );
           },
         )}
-      {audioStorage && (
+      {isMidiComplete && (
         <MergeMidiButton
           tempo={tempo.current}
           audioStorage={audioStorage}
