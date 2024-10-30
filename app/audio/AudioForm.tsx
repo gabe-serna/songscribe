@@ -18,6 +18,12 @@ import getTempo from "@/utils/getTempo";
 import { useContext, useState } from "react";
 import { AudioContext } from "./AudioProvider";
 import { AudioStorage } from "@/utils/types";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const formSchema = z.object({
@@ -38,13 +44,13 @@ const formSchema = z.object({
       },
     ),
   separation_mode: z.enum(["solo", "duet", "small_band", "full_band"]),
+  start_time: z.number().int().min(0).optional(),
+  end_time: z.number().int().min(0).optional(),
 });
 
 export default function AudioForm() {
-  const { audioStorage, setAudioStorage, songName, tempo } =
-    useContext(AudioContext);
+  const { setAudioStorage, songName, tempo } = useContext(AudioContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const apiBaseUrl = "http://localhost:8000";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,16 +90,22 @@ export default function AudioForm() {
     }
     formData.append("separation_mode", separation_mode as string);
     formData.append("tempo", `${tempo.current}`);
-    formData.append("start_time", `${28}`);
-    formData.append("end_time", `${71}`);
+    if (values.start_time)
+      formData.append("start_time", `${values.start_time}`);
+    if (values.end_time) formData.append("end_time", `${values.end_time}`);
 
     try {
+      console.log("start time", formData.get("start_time"));
+      console.log("end time", formData.get("end_time"));
       setIsSubmitting(true);
-      const response = await fetch(`${apiBaseUrl}/split-audio`, {
-        method: "POST",
-        mode: "cors",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/split-audio`,
+        {
+          method: "POST",
+          mode: "cors",
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         throw new Error("Failed to isolate audio");
@@ -173,6 +185,69 @@ export default function AudioForm() {
             </FormItem>
           )}
         />
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>Optional</AccordionTrigger>
+            <AccordionContent>
+              <FormField
+                control={form.control}
+                name="start_time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Time</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        required={false}
+                        aria-required={false}
+                        value={field.value ?? ""}
+                        onChange={(e) => {
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseInt(e.target.value),
+                          );
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Audio start time in seconds.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="end_time"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>End Time</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        required={false}
+                        aria-required={false}
+                        value={field.value ?? ""}
+                        onChange={(e) => {
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseInt(e.target.value),
+                          );
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Audio end time in seconds.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Converting..." : "Submit"}
         </Button>
