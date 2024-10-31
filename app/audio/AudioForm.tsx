@@ -1,5 +1,4 @@
 "use client";
-import JSZip from "jszip";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,13 +16,13 @@ import {
 import getTempo from "@/utils/getTempo";
 import { useContext, useState } from "react";
 import { AudioContext } from "./AudioProvider";
-import { AudioStorage } from "@/utils/types";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import isolateAudio from "@/utils/isolateAudio";
 
 const validMimeTypes = ["audio/mpeg", "audio/wav", "audio/ogg, audio/flac"];
 const formSchema = z.object({
@@ -43,20 +42,22 @@ const formSchema = z.object({
           "Invalid file type. Only MP3, WAV, OGG, or FLAC files are allowed.",
       },
     ),
-  separation_mode: z.enum(["solo", "duet", "small_band", "full_band"]),
+  separation_mode: z.enum(["Solo", "Duet", "Small Band", "Full Band"]),
   start_time: z.number().int().min(0).optional(),
   end_time: z.number().int().min(0).optional(),
+  tempo: z.number().int().min(0).optional(),
 });
 
 export default function AudioForm() {
-  const { setAudioStorage, songName, tempo } = useContext(AudioContext);
+  const { audioStorage, setAudioStorage, songName, tempo } =
+    useContext(AudioContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       audio_file: null,
-      separation_mode: "solo",
+      separation_mode: "Solo",
     },
   });
 
@@ -64,74 +65,28 @@ export default function AudioForm() {
     const fileList = values.audio_file;
     const file = fileList[0] as File;
     if (!file) return;
-
-    const bpm = await getTempo(file);
-    tempo.current = Math.round(bpm);
     songName.current = file.name.split(".")[0];
+
+    // Set Tempo
+    if (!values.tempo) {
+      tempo.current = await getTempo(file);
+    } else tempo.current = values.tempo;
     console.log("tempo: ", tempo.current);
 
+    // Create Form Data
     const formData = new FormData();
     formData.append("audio_file", file);
-
-    let separation_mode: String;
-    switch (values.separation_mode) {
-      case "duet":
-        separation_mode = "Vocals & Instrumental (High Quality, Slower)";
-        break;
-      case "small_band":
-        separation_mode = "Vocals, Drums, Bass & Other (Slower)";
-        break;
-      case "full_band":
-        separation_mode = "Vocal, Drums, Bass, Guitar, Piano & Other (Slowest)";
-        break;
-      case "solo":
-      default:
-        separation_mode = "Vocals & Instrumental (Low Quality, Faster)";
-    }
-    formData.append("separation_mode", separation_mode as string);
+    formData.append("separation_mode", values.separation_mode);
     formData.append("tempo", `${tempo.current}`);
     if (values.start_time)
       formData.append("start_time", `${values.start_time}`);
     if (values.end_time) formData.append("end_time", `${values.end_time}`);
 
-    try {
-      console.log("start time", formData.get("start_time"));
-      console.log("end time", formData.get("end_time"));
-      setIsSubmitting(true);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/split-audio`,
-        {
-          method: "POST",
-          mode: "cors",
-          body: formData,
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to isolate audio");
-      }
-
-      JSZip.loadAsync(response.blob()).then((zip) => {
-        zip.forEach((relativePath, file) => {
-          file.async("blob").then((blob) => {
-            const name = relativePath.split(".")[0];
-            setAudioStorage(
-              (prev) =>
-                ({
-                  ...prev,
-                  [name]: { name, audioBlob: blob, midiBlob: null },
-                }) as AudioStorage,
-            );
-          });
-        });
-      });
-      console.log("Audio isolated successfully");
-    } catch (error) {
-      console.error(error);
-      alert("Error converting isolating audio");
-    } finally {
+    // Make API Request
+    setIsSubmitting(true);
+    isolateAudio(formData, setAudioStorage).then(() => {
       setIsSubmitting(false);
-    }
+    });
   }
 
   return (
@@ -172,10 +127,10 @@ export default function AudioForm() {
                   }}
                   className="w-full"
                 >
-                  <option value="solo">Solo</option>
-                  <option value="duet">Duet</option>
-                  <option value="small_band">Small Band</option>
-                  <option value="full_band">Full Band</option>
+                  <option value="Solo">Solo</option>
+                  <option value="Duet">Duet</option>
+                  <option value="Small Band">Small Band</option>
+                  <option value="Full Band">Full Band</option>
                 </select>
               </FormControl>
               <FormDescription>
@@ -240,6 +195,34 @@ export default function AudioForm() {
                     </FormControl>
                     <FormDescription>
                       Audio end time in seconds.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="tempo"
+                render={({ field }) => (
+                  <FormItem className="mt-4">
+                    <FormLabel>Tempo</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        required={false}
+                        aria-required={false}
+                        value={field.value ?? ""}
+                        onChange={(e) => {
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : parseInt(e.target.value),
+                          );
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Song tempo in beats per minute.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
