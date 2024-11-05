@@ -22,3 +22,14 @@ export interface AudioStorage {
   piano: Stem;
   others: Stem;
 }
+
+export type SeparationMode = "Solo" | "Duet" | "Small Band" | "Full Band";
+
+export interface AudioFormData {
+  audio_file?: File;
+  audio_link?: string;
+  separation_mode?: SeparationMode;
+  start_time?: number;
+  end_time?: number;
+  tempo?: number;
+}

@@ -19,6 +19,9 @@ const config = {
     },
     extend: {
       colors: {
+        stone: {
+          750: "#363130",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

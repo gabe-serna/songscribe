@@ -1,7 +1,8 @@
-import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
-import { Lexend, Manjari } from "next/font/google";
+import { Lexend, Nunito } from "next/font/google";
 import "./globals.css";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { Toaster } from "@/components/ui/toaster";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -12,10 +13,9 @@ const lexend = Lexend({
   variable: "--font-lexend",
 });
 
-const manjari = Manjari({
+const nunito = Nunito({
   subsets: ["latin"],
-  variable: "--font-manjari",
-  weight: ["100", "400", "700"],
+  variable: "--font-nunito",
 });
 
 export const metadata = {
@@ -32,13 +32,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${lexend.variable} ${manjari.variable}`}
+      className={`${lexend.variable} ${nunito.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
@@ -49,10 +49,13 @@ export default function RootLayout({
                 {children}
               </div>
 
-              <footer className="mx-auto flex w-full items-center justify-center gap-8 border-t py-16 text-center text-xs"></footer>
+              <footer className="mx-auto flex w-full items-center justify-center gap-8 border-t py-16 text-center text-xs">
+                <ThemeSwitcher />
+              </footer>
             </div>
           </main>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
