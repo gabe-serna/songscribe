@@ -14,7 +14,6 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
-    "@tonejs/midi": "^2.0.28",
     "@wavesurfer/react": "^1.0.7",
     "autoprefixer": "10.4.17",
     "class-variance-authority": "^0.7.0",
@@ -30,6 +29,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.53.1",
     "tone": "^15.0.4",
+    "tonejs-midi-fix": "^2.0.28",
     "wavesurfer.js": "^7.8.7",
     "web-audio-beat-detector": "^8.2.16",
     "zod": "^3.23.8"

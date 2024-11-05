@@ -1,14 +1,14 @@
 "use client";
 import { ChangeEvent, useState } from "react";
-import { Header, Midi } from "@tonejs/midi";
-import { ControlChanges } from "@tonejs/midi/dist/ControlChanges";
+import { Header, Midi } from "tonejs-midi-fix";
+// import { ControlChanges } from "tonejs-midi-fix/dist/ControlChanges";
 
-interface Note {
-  name: string;
-  time: number;
-  duration: number;
-  velocity: number;
-}
+// interface Note {
+//   name: string;
+//   time: number;
+//   duration: number;
+//   velocity: number;
+// }
 
 interface Track {
   header: Header;

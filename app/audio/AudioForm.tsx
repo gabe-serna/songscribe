@@ -65,6 +65,8 @@ export default function AudioForm() {
     const fileList = values.audio_file;
     const file = fileList[0] as File;
     if (!file) return;
+
+    setIsSubmitting(true);
     songName.current = file.name.split(".")[0];
 
     // Set Tempo
@@ -83,7 +85,6 @@ export default function AudioForm() {
     if (values.end_time) formData.append("end_time", `${values.end_time}`);
 
     // Make API Request
-    setIsSubmitting(true);
     isolateAudio(formData, setAudioStorage).then(() => {
       setIsSubmitting(false);
     });

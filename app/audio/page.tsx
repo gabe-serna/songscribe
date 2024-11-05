@@ -14,14 +14,9 @@ export default function Page() {
   const [flatScore, setFlatScore] = useState<string | null>(null);
   const [isMidiComplete, setIsMidiComplete] = useState(false);
   const flatRef = useRef<HTMLDivElement>(null);
-  // const lastRun = useRef(Date.now());
 
   // Convert to Midi
   useEffect(() => {
-    // Temporarily throttle the conversion to once per second
-    // if (Date.now() - lastRun.current < 1000) return;
-    // lastRun.current = Date.now();
-
     handleMidiConversion(audioStorage, setAudioStorage, tempo).then(
       (isComplete) => {
         if (isComplete) {
@@ -50,6 +45,19 @@ export default function Page() {
         console.error("Failed to load flat-embed:", error);
       });
   }, [flatScore]);
+
+  // Warn user before leaving the page
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   return (
     <div className="flex w-full flex-col justify-around">

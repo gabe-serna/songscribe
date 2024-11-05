@@ -1,5 +1,6 @@
-import { Midi } from "@tonejs/midi";
-import { Instrument } from "@tonejs/midi/dist/Instrument";
+import { Midi } from "tonejs-midi-fix";
+import { KeySignatureEvent } from "tonejs-midi-fix/dist/Header";
+import { Instrument } from "tonejs-midi-fix/dist/Instrument";
 
 type Stem =
   | "vocals"
@@ -65,14 +66,14 @@ export default async function mergeMidi(
   let currentChannel = 0;
 
   combinedMidi.header.timeSignatures = [
-    {
-      ticks: 0,
-      timeSignature: [4, 4],
-      measures: 0,
-    },
+    { ticks: 0, timeSignature: [4, 4], measures: 0 },
   ];
+  const mostCommonKeySignature = getMostCommonKeySignature(midiFiles);
+  combinedMidi.header.keySignatures = [mostCommonKeySignature];
   combinedMidi.header.setTempo(Math.round(tempo));
   combinedMidi.header.name = songName;
+  combinedMidi.header.update();
+
   const ratio = combinedMidi.header.ppq / 220;
   const scaleFactor = ratio / ratio;
   // ^ Don't ask me why I have to multiply everything by 1
@@ -109,6 +110,30 @@ export default async function mergeMidi(
     i++;
   }
 
+  console.log(combinedMidi.header.keySignatures);
   const combinedMidiBuffer = combinedMidi.toArray();
   return combinedMidiBuffer;
+}
+
+function getMostCommonKeySignature(
+  midiFiles: Array<ArrayBuffer>,
+): KeySignatureEvent {
+  const counts: {
+    [key: string]: { count: number; keySignature: KeySignatureEvent };
+  } = {};
+
+  midiFiles.forEach((file) => {
+    const midi = new Midi(file);
+    midi.header.keySignatures.map((keySig) => {
+      const key = `${keySig.key} ${keySig.scale}`;
+      if (counts[key]) {
+        counts[key].count += 1;
+      } else {
+        counts[key] = { count: 1, keySignature: keySig };
+      }
+    });
+  });
+
+  return Object.values(counts).reduce((a, b) => (a.count >= b.count ? a : b))
+    .keySignature;
 }

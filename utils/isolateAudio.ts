@@ -5,8 +5,8 @@ export default async function isolateAudio(
   formData: FormData,
   setAudioStorage: React.Dispatch<React.SetStateAction<AudioStorage | null>>,
 ) {
-  if (formData.get("separation_mode") === "Solo") alignSingle();
-  else isolateTracks();
+  if (formData.get("separation_mode") === "Solo") await alignSingle();
+  else await isolateTracks();
 
   async function isolateTracks() {
     try {

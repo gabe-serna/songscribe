@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as Tone from "tone";
-import { Midi } from "@tonejs/midi";
+import { Midi } from "tonejs-midi-fix";
 
 interface PianoRollProps {
   midiFile: Blob; // Accepting the MIDI file as a Blob prop
