@@ -2,39 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.font-heading {
-  font-family: var(--font-lexend);
-}
-
-p,
-button,
-label,
-input,
-select,
-textarea,
-a,
-.font-body {
-  font-family: var(--font-nunito);
-}
-
-@layer utilities {
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-}
-
 @layer base {
   :root {
     --background: 60 5% 96%;
@@ -98,5 +65,51 @@ a,
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
+  font-family: var(--font-lexend);
+}
+
+p,
+button,
+label,
+input,
+select,
+textarea,
+a,
+.font-body {
+  font-family: var(--font-nunito);
+}
+
+.fade-enter {
+  @apply -translate-y-4 opacity-0;
+}
+.fade-enter-active {
+  @apply translate-y-0 opacity-100 duration-700 ease-in-out;
+}
+.fade-exit {
+  @apply translate-y-0 opacity-100;
+}
+.fade-exit-active {
+  @apply translate-y-4 opacity-0 duration-700 ease-in-out;
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }
