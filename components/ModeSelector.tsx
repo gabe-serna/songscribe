@@ -78,6 +78,7 @@ const ModeSelector = forwardRef<HTMLDivElement, Props>(
             setHoveredMode(null);
           }
         }}
+        ref={ref}
         style={{ transitionDelay: `${index * 200}ms` }}
         className="w-full py-4 lg:w-3/4"
       >
