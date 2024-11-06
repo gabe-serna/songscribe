@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
-import Waveform from "@/components/Waveform";
 import MergeMidiButton from "@/components/MergeMidiButton";
 import { AudioStorage, Stem } from "@/utils/types";
 import { AudioContext } from "./AudioProvider";
 import AudioForm from "./AudioForm";
 import handleMidiConversion from "@/utils/getMidi";
+import AudioMidiVisualizer from "@/components/AudioMidiVisualizer";
 
 export default function Page() {
   const { audioForm, audioStorage, setAudioStorage, songName } =
@@ -69,7 +69,7 @@ export default function Page() {
           ([key, stem]) => {
             if (!stem.midiBlob) return;
             return (
-              <Waveform
+              <AudioMidiVisualizer
                 key={key}
                 name={stem.name}
                 audioBlob={stem.audioBlob}

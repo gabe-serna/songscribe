@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTheme } from "next-themes";
+import React, { useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import { Midi } from "tonejs-midi-fix";
 
 interface PianoRollProps {
-  midiFile: Blob; // Accepting the MIDI file as a Blob prop
+  midiFile: Blob;
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
   progress: number;
@@ -25,58 +26,122 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   progress,
   duration,
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const pianoKeysCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const notesCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pianoKeysContainerRef = useRef<HTMLDivElement | null>(null);
+  const notesContainerRef = useRef<HTMLDivElement | null>(null);
   const [midiData, setMidiData] = useState<MidiNote[]>([]);
+  const activeNotesRef = useRef<Set<string>>(new Set());
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const tempo = useRef(120);
 
-  useEffect(() => {
-    // Parse the MIDI file and extract note data from the Blob
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const arrayBuffer = e.target?.result as ArrayBuffer;
-      if (arrayBuffer) {
-        const midi = await Midi.fromUrl(URL.createObjectURL(midiFile));
-        // const midi = await Midi.fromUrl("/audio/tsubasa_bass.mid");
+  // Constants
+  const pianoKeyWidth = 50;
+  const noteHeight = 7;
+  const totalNotes = 88;
+  const canvasHeight = totalNotes * noteHeight;
+  const containerWidth = 950;
+  const containerHeight = 400;
 
-        // Extract note data
-        const notes: MidiNote[] = [];
-        tempo.current = midi.header.tempos[0].bpm;
-        midi.tracks.forEach((track) => {
-          track.notes.forEach((note) => {
-            notes.push({
-              time: note.time,
-              note: note.name,
-              duration: note.duration,
-            });
+  // Helper function to compare two sets
+  const areSetsEqual = (a: Set<string>, b: Set<string>): boolean => {
+    if (a.size !== b.size) return false;
+    for (let item of a) {
+      if (!b.has(item)) return false;
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    // Parse the MIDI file
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const arrayBuffer = await midiFile.arrayBuffer();
+      const midi = new Midi(arrayBuffer);
+
+      // Extract note data
+      const notes: MidiNote[] = [];
+      tempo.current = midi.header.tempos[0]?.bpm || 120;
+      midi.tracks.forEach((track) => {
+        track.notes.forEach((note) => {
+          notes.push({
+            time: note.time,
+            note: note.name,
+            duration: note.duration,
           });
         });
+      });
 
-        setMidiData(notes); // Save parsed MIDI notes to state
-        drawPianoRoll(notes); // Render the piano roll
-      }
+      setMidiData(notes);
+      drawPianoKeys(); // Draw piano keys once
+      drawNotes(notes);
     };
 
-    reader.readAsArrayBuffer(midiFile); // Read the MIDI Blob as an ArrayBuffer
+    reader.readAsArrayBuffer(midiFile);
   }, [midiFile]);
 
-  // Function to render the piano roll
-  const drawPianoRoll = (notes: MidiNote[]) => {
-    const canvas = canvasRef.current;
+  // Draw piano keys with active notes highlighted
+  const drawPianoKeys = (activeNotes: Set<string> = activeNotesRef.current) => {
+    const canvas = pianoKeysCanvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = pianoKeyWidth;
+    canvas.height = canvasHeight;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < totalNotes; i++) {
+      const midiNote = 21 + i;
+      const isBlack = isBlackKey(midiNote);
+      const y = i * noteHeight;
+      const noteName = Tone.Frequency(midiNote, "midi").toNote();
+
+      // Determine if the current key is active
+      const isActive = activeNotes.has(noteName);
+
+      // Set fill color based on active state
+      if (isActive) {
+        ctx.fillStyle = isBlack ? "#ca8a04" : "#fde047"; // Yellow colors for active keys
+      } else {
+        ctx.fillStyle = isBlack ? "black" : "white"; // Default colors for inactive keys
+      }
+
+      ctx.fillRect(0, canvasHeight - y - noteHeight, pianoKeyWidth, noteHeight);
+      ctx.strokeStyle = "black";
+      ctx.strokeRect(
+        0,
+        canvasHeight - y - noteHeight,
+        pianoKeyWidth,
+        noteHeight,
+      );
+    }
+  };
+
+  // Determine if a MIDI note is a black key
+  const isBlackKey = (midiNote: number): boolean => {
+    const noteIndex = midiNote % 12;
+    return [1, 3, 6, 8, 10].includes(noteIndex); // C#, D#, F#, G#, A#
+  };
+
+  const drawNotes = (notes: MidiNote[]) => {
+    const canvas = notesCanvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const height = canvas.height;
-    const noteHeight = 5; // Height of each note block
     const secondsPerBeat = 60 / tempo.current;
     const eightMeasures = 8 * 4 * secondsPerBeat;
-    const timeScale = 1000 / eightMeasures; // Pixels Per Second
-    canvas.width = duration * timeScale + 1000;
+    const timeScale = 950 / eightMeasures; // Pixels Per Second
+    canvas.width = duration * timeScale + 950;
 
-    ctx.clearRect(0, 0, 1000, height);
+    ctx.clearRect(0, 0, 950, height);
 
     // Draw each note as a rectangle
     notes.forEach((note) => {
@@ -84,17 +149,22 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       const y = (Tone.Frequency(note.note).toMidi() - 21) * noteHeight;
       const noteWidth = note.duration * timeScale;
 
-      ctx.fillStyle = "#eab308"; // Note color - yellow-500
-      ctx.fillRect(x, height - y - noteHeight, noteWidth, noteHeight); // Draw the note rectangle
+      ctx.fillStyle = isDark ? "#a8a29e" : "#44403c";
+      ctx.fillRect(x, height - y - noteHeight, noteWidth, noteHeight);
     });
   };
 
-  // Play the MIDI file using Tone.js
-  const playMidi = () => {
-    const synth = new Tone.PolySynth(Tone.AMSynth).toDestination();
+  // Play MIDI
+  const playMidi = async () => {
+    await Tone.start();
+    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
     const transport = Tone.getTransport();
     const startTime = getScrollTime(progress, duration);
 
+    // Reset active notes
+    activeNotesRef.current = new Set();
+
+    // Schedule each note
     midiData.forEach((note) => {
       let time = note.time - startTime;
       transport.schedule((t) => {
@@ -106,12 +176,14 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     setIsPlaying(true);
   };
 
-  // Stop playback
+  // Stop Midi
   const stopMidi = () => {
     const transport = Tone.getTransport();
     transport.stop();
     transport.cancel();
     setIsPlaying(false);
+    activeNotesRef.current = new Set(); // Clear active notes
+    drawPianoKeys(); // Redraw piano keys to reset colors
   };
 
   useEffect(() => {
@@ -120,26 +192,93 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       const transport = Tone.getTransport();
       transport.stop();
       transport.cancel();
+      activeNotesRef.current = new Set();
+      drawPianoKeys();
     }
   }, [isPlaying]);
 
+  // Sync vertical scrolling
+  const syncScroll = () => {
+    if (pianoKeysContainerRef.current && notesContainerRef.current) {
+      pianoKeysContainerRef.current.scrollTop =
+        notesContainerRef.current.scrollTop;
+    }
+  };
+
   useEffect(() => {
-    if (containerRef.current) {
-      setScrollPercentage(containerRef.current, progress);
+    if (notesContainerRef.current) {
+      setScrollPercentage(notesContainerRef.current, progress);
     }
   }, [progress]);
 
+  // Update active notes based on progress
+  useEffect(() => {
+    // Determine the current time based on progress
+    const currentTime = (progress / 100) * duration;
+
+    // Find all notes that are active at the currentTime
+    const currentlyActiveNotes = new Set<string>();
+
+    midiData.forEach((note) => {
+      if (
+        currentTime >= note.time &&
+        currentTime <= note.time + note.duration
+      ) {
+        currentlyActiveNotes.add(note.note);
+      }
+    });
+
+    // Update the activeNotesRef only if there is a change
+    if (!areSetsEqual(activeNotesRef.current, currentlyActiveNotes)) {
+      activeNotesRef.current = currentlyActiveNotes;
+      // Redraw piano keys to reflect active notes
+      drawPianoKeys(currentlyActiveNotes);
+    }
+  }, [progress, duration, midiData]);
+
   return (
     <div>
-      <div className="relative flex h-[420px]">
+      <div
+        className="relative flex rounded-2xl bg-accent shadow-lg dark:shadow-stone-900"
+        style={{ height: containerHeight }}
+      >
         <div
-          ref={containerRef}
-          className="no-scrollbar h-full w-[1000px] overflow-x-scroll"
+          className="piano-roll-container flex"
+          style={{ position: "relative" }}
         >
-          <canvas ref={canvasRef} width={1000} height={400} />
-        </div>
+          {/* Piano Keys Container */}
+          <div
+            ref={pianoKeysContainerRef}
+            className="piano-keys-container no-scrollbar overflow-hidden"
+            style={{
+              width: pianoKeyWidth,
+              height: containerHeight,
+            }}
+          >
+            <canvas
+              ref={pianoKeysCanvasRef}
+              width={pianoKeyWidth}
+              height={canvasHeight}
+            />
+          </div>
 
-        {/* <div className="absolute h-full w-16 bg-white" /> */}
+          {/* Notes Container */}
+          <div
+            ref={notesContainerRef}
+            className="overflow-x-hidden overflow-y-scroll"
+            style={{
+              width: containerWidth,
+              height: containerHeight,
+            }}
+            onScroll={syncScroll}
+          >
+            <canvas
+              ref={notesCanvasRef}
+              width={containerWidth}
+              height={canvasHeight}
+            />
+          </div>
+        </div>
       </div>
 
       <div style={{ marginTop: "10px" }}>
@@ -153,6 +292,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
 export default PianoRoll;
 
+// Helper Functions
 function setScrollPercentage(
   element: HTMLDivElement,
   percentage: number,

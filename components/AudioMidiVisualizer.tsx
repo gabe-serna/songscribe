@@ -4,7 +4,7 @@ import PianoRoll from "@/components/PianoRoll";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 
-export default function Waveform({
+export default function AudioMidiVisualizer({
   name,
   audioBlob,
   midiFile,
@@ -21,6 +21,9 @@ export default function Waveform({
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [url, setUrl] = useState<string | null>(null);
+  const title = name
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 
   useEffect(() => {
     if (audioBlob) {
@@ -35,12 +38,12 @@ export default function Waveform({
     }
   }, [audioBlob]);
 
-  const { wavesurfer, isReady, currentTime } = useWavesurfer({
+  const { wavesurfer, isReady } = useWavesurfer({
     container: containerRef,
     url: url || "",
-    waveColor: "#44403c", //stone-700
-    progressColor: "#292524", //stone-800
-    height: 100,
+    waveColor: "#eab308", //yellow-500
+    progressColor: "#ca8a04", //yellow-600
+    height: 50,
     barWidth: 5,
     barRadius: 5,
     autoScroll: true,
@@ -80,7 +83,9 @@ export default function Waveform({
 
   useEffect(() => {
     if (isPlaying) {
-      wavesurfer?.play();
+      setTimeout(() => {
+        wavesurfer?.play();
+      }, 50);
     } else {
       wavesurfer?.pause();
     }
@@ -88,8 +93,8 @@ export default function Waveform({
 
   return (
     <div className="flex h-full w-[1000px] flex-col justify-center">
-      <h1 className="text-xl"> {name} </h1>
-      <div>
+      <h1 className="text-2xl font-bold">{title}</h1>
+      <div className="mt-4">
         {progressRef.current && (
           <PianoRoll
             midiFile={midiFile}
@@ -100,10 +105,12 @@ export default function Waveform({
           />
         )}
       </div>
-      <div
-        className={isPlaying ? "pointer-events-none" : "cursor-col-resize"}
-        ref={containerRef}
-      />
+      <div className="mb-8 rounded-2xl bg-accent p-4 shadow-lg">
+        <div
+          className={isPlaying ? "pointer-events-none" : "cursor-col-resize"}
+          ref={containerRef}
+        />
+      </div>
     </div>
   );
 }
