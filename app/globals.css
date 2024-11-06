@@ -74,6 +74,7 @@ h3,
 h4,
 h5,
 h6,
+figcaption,
 .font-heading {
   font-family: var(--font-lexend);
 }
@@ -112,4 +113,23 @@ a,
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+}
+
+.transition-visible {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Transition to: Invisible and fully transparent */
+.transition-invisible {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }

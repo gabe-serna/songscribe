@@ -51,7 +51,7 @@ export default function AudioPart1() {
           type="text"
           placeholder="https://youtu.be/dQw4w9WgXcQ"
           className="mt-2"
-        ></Input>
+        />
       </form>
       <span className="font-heading mx-auto mt-4 block w-max font-semibold">
         OR

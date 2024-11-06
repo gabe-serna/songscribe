@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import AudioPart1 from "@/app/audio/AudioPart1";
 import { AudioContext } from "@/app/audio/AudioProvider";
+import AudioPart2 from "./AudioPart2";
 
 export default function AudioForm() {
   const { audioForm } = useContext(AudioContext);
@@ -14,8 +15,8 @@ export default function AudioForm() {
   }, [audioForm]);
 
   return (
-    <div className="flex h-[50vh]">
-      <CSSTransition
+    <div className="flex pt-16">
+      {/* <CSSTransition
         in={!isPart1Complete}
         timeout={700}
         classNames="fade"
@@ -28,16 +29,21 @@ export default function AudioForm() {
           </h1>
           <AudioPart1 />
         </div>
-      </CSSTransition>
+      </CSSTransition> */}
 
-      <CSSTransition
+      {/* <CSSTransition
         in={isPart2Visible}
         timeout={700}
         classNames="fade"
         unmountOnExit
-      >
-        <h2>Part 2</h2>
-      </CSSTransition>
+      > */}
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <h1 className="text-center text-3xl font-bold lg:text-4xl">
+          Choose Isolation Mode
+        </h1>
+        <AudioPart2 />
+      </div>
+      {/* </CSSTransition> */}
     </div>
   );
 }
