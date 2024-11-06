@@ -167,8 +167,9 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     // Schedule each note
     midiData.forEach((note) => {
       let time = note.time - startTime;
+      const duration = Math.max(note.duration, 0.01);
       transport.schedule((t) => {
-        synth.triggerAttackRelease(note.note, note.duration, t);
+        synth.triggerAttackRelease(note.note, duration, t);
       }, time);
     });
 

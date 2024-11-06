@@ -3,6 +3,7 @@
 import PianoRoll from "@/components/PianoRoll";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
+import WaveSurfer from "wavesurfer.js";
 
 export default function AudioMidiVisualizer({
   name,
@@ -14,7 +15,6 @@ export default function AudioMidiVisualizer({
   midiFile: Blob;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const progressRef = useRef<HTMLDivElement | null>(null);
   const durationRef = useRef<number | null>(null);
   const lastRun = useRef(Date.now());
 
@@ -29,7 +29,6 @@ export default function AudioMidiVisualizer({
     if (audioBlob) {
       const objectURL = URL.createObjectURL(audioBlob);
       setUrl(objectURL);
-      console.log("objectURL: ", objectURL);
       wavesurfer?.load(objectURL);
 
       return () => {
@@ -52,8 +51,7 @@ export default function AudioMidiVisualizer({
   });
 
   wavesurfer?.on("timeupdate", () => {
-    const prog = getProgressPercent(progressRef) as number;
-    setProgress(prog);
+    setProgress(getProgressPercent(wavesurfer));
   });
 
   wavesurfer?.on("finish", () => {
@@ -66,14 +64,10 @@ export default function AudioMidiVisualizer({
     setProgress(0);
   });
 
-  // Store Progress Bar Element
+  // Initialize Progress
   useEffect(() => {
     if (!isReady) return;
-    const child = containerRef.current?.childNodes[0] as HTMLDivElement;
-    const shadowRoot = child.shadowRoot;
-    if (!shadowRoot) return;
-    progressRef.current = shadowRoot.querySelector(".progress");
-    setProgress(getProgressPercent(progressRef) as number);
+    setProgress(getProgressPercent(wavesurfer));
 
     // Ensure Midi and Audio have same duration
     if (!wavesurfer) return;
@@ -85,7 +79,7 @@ export default function AudioMidiVisualizer({
     if (isPlaying) {
       setTimeout(() => {
         wavesurfer?.play();
-      }, 50);
+      }, 100);
     } else {
       wavesurfer?.pause();
     }
@@ -95,7 +89,7 @@ export default function AudioMidiVisualizer({
     <div className="flex h-full w-[1000px] flex-col justify-center">
       <h1 className="text-2xl font-bold">{title}</h1>
       <div className="mt-4">
-        {progressRef.current && (
+        {durationRef.current && (
           <PianoRoll
             midiFile={midiFile}
             isPlaying={isPlaying}
@@ -115,13 +109,7 @@ export default function AudioMidiVisualizer({
   );
 }
 
-function getProgressPercent(
-  progressRef: React.MutableRefObject<HTMLDivElement | null>,
-) {
-  if (progressRef.current) {
-    const width = window.getComputedStyle(progressRef.current).width;
-    const progress = parseInt(width) / 10;
-    // console.log("progress: ", progress, "%");
-    return progress;
-  }
+function getProgressPercent(wavesurfer: WaveSurfer | null) {
+  if (!wavesurfer) return 0;
+  return (wavesurfer.getCurrentTime() / wavesurfer.getDuration()) * 100;
 }
