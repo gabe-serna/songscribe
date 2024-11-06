@@ -44,6 +44,7 @@ const iconContainerClassName =
   "flex w-full items-center justify-center space-x-4";
 
 interface Props {
+  index: number;
   mode: SeparationMode;
   selectedMode: SeparationMode | null;
   setSelectedMode: (mode: SeparationMode | null) => void;
@@ -52,6 +53,7 @@ interface Props {
 }
 
 export default function ModeSelector({
+  index,
   mode,
   selectedMode,
   setSelectedMode,
@@ -64,7 +66,7 @@ export default function ModeSelector({
     ? `${figureClassName} ${selectedClassName}`
     : `${figureClassName} outline-transparent `;
   const opacity =
-    hoveredMode !== null && hoveredMode !== mode ? "opacity-50" : "";
+    hoveredMode !== null && hoveredMode !== mode ? "opacity-30" : "";
 
   return (
     <div
@@ -78,6 +80,7 @@ export default function ModeSelector({
           setHoveredMode(null);
         }
       }}
+      style={{ transitionDelay: `${index * 200}ms` }}
       className="w-full py-4 lg:w-3/4"
     >
       <figure

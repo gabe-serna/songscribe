@@ -9,6 +9,7 @@ export default function AudioForm() {
   const { audioForm } = useContext(AudioContext);
   const isPart1Complete = audioForm.audio_file || audioForm.audio_link;
   const [isPart2Visible, setIsPart2Visible] = useState(false);
+  const [part2Entered, setPart2Entered] = useState(false);
 
   useEffect(() => {
     if (audioForm.separation_mode) setIsPart2Visible(false);
@@ -16,7 +17,7 @@ export default function AudioForm() {
 
   return (
     <div className="flex pt-16">
-      {/* <CSSTransition
+      <CSSTransition
         in={!isPart1Complete}
         timeout={700}
         classNames="fade"
@@ -29,21 +30,25 @@ export default function AudioForm() {
           </h1>
           <AudioPart1 />
         </div>
-      </CSSTransition> */}
+      </CSSTransition>
 
-      {/* <CSSTransition
+      <CSSTransition
         in={isPart2Visible}
         timeout={700}
         classNames="fade"
+        onEntered={() => {
+          console.log("entered!!");
+          setPart2Entered(true);
+        }}
         unmountOnExit
-      > */}
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <h1 className="text-center text-3xl font-bold lg:text-4xl">
-          Choose Isolation Mode
-        </h1>
-        <AudioPart2 />
-      </div>
-      {/* </CSSTransition> */}
+      >
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <h1 className="text-center text-3xl font-bold lg:text-4xl">
+            Choose Isolation Mode
+          </h1>
+          <AudioPart2 />
+        </div>
+      </CSSTransition>
     </div>
   );
 }

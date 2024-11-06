@@ -1,27 +1,53 @@
-import React, { useState } from "react";
-import ModeSelector from "@/components/ModeSelector";
+import React, { useContext, useState } from "react";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { AudioContext } from "@/app/audio/AudioProvider";
 import type { SeparationMode } from "@/utils/types";
+import ModeSelector from "@/components/ModeSelector";
 import { Button } from "@/components/ui/button";
 
 const modes: SeparationMode[] = ["Solo", "Duet", "Small Band", "Full Band"];
 
 export default function AudioPart2() {
+  const { audioForm, setAudioForm } = useContext(AudioContext);
   const [hoveredMode, setHoveredMode] = useState<SeparationMode | null>(null);
   const [selectedMode, setSelectedMode] = useState<SeparationMode | null>(null);
 
+  function handleModeSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setAudioForm({
+      ...audioForm,
+      separation_mode: selectedMode as SeparationMode,
+    });
+  }
+
   return (
-    <form className="flex w-full flex-col items-center justify-center">
-      {modes.map((mode) => (
-        <ModeSelector
-          key={mode}
-          mode={mode}
-          selectedMode={selectedMode}
-          setSelectedMode={setSelectedMode}
-          hoveredMode={hoveredMode}
-          setHoveredMode={setHoveredMode}
-        />
-      ))}
+    <form
+      onSubmit={handleModeSubmit}
+      className="flex w-full flex-col items-center justify-center"
+    >
+      <TransitionGroup component={null} appear>
+        {modes.map((mode, index) => (
+          <CSSTransition
+            in={selectedMode != null}
+            key={mode}
+            timeout={700 + index * 200}
+            classNames="fade"
+            onEntered={() => console.log("entered")}
+            onExited={() => console.log("exited")}
+          >
+            <ModeSelector
+              index={index}
+              mode={mode}
+              selectedMode={selectedMode}
+              setSelectedMode={setSelectedMode}
+              hoveredMode={hoveredMode}
+              setHoveredMode={setHoveredMode}
+            />
+          </CSSTransition>
+        ))}
+      </TransitionGroup>
       <Button
+        type="submit"
         className={`mt-4 w-full rounded-full bg-accent text-base font-semibold text-foreground shadow-lg hover:bg-accent dark:shadow-stone-900 lg:w-3/4 ${selectedMode ? "transition-visible" : "transition-invisible"}`}
       >
         Next
