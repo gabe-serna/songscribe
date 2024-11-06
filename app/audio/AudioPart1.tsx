@@ -37,7 +37,7 @@ export default function AudioPart1() {
   }
 
   return (
-    <div className="w-full max-w-[500px] rounded-2xl bg-accent p-6 shadow-lg dark:shadow-stone-900 lg:w-3/4 lg:p-8">
+    <div className="h-min w-full max-w-[500px] rounded-2xl bg-accent p-6 shadow-lg dark:shadow-stone-900 lg:w-3/4 lg:p-8">
       <form onSubmit={handleSongLinkSubmit}>
         <Label
           htmlFor="song-link"

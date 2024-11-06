@@ -43,9 +43,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <main className="flex min-h-screen flex-col items-center">
-            <div className="flex w-full flex-1 flex-col items-center gap-20">
+            <div className="flex w-full flex-1 flex-col items-center">
               {/* <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10"></nav> */}
-              <div className="flex max-w-5xl flex-col gap-20 p-5">
+              <div className="flex h-screen max-w-5xl flex-col items-center justify-center gap-20 p-5">
                 {children}
               </div>
 

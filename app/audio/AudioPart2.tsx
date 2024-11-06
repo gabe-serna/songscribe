@@ -32,8 +32,6 @@ export default function AudioPart2() {
             key={mode}
             timeout={700 + index * 200}
             classNames="fade"
-            onEntered={() => console.log("entered")}
-            onExited={() => console.log("exited")}
           >
             <ModeSelector
               index={index}
