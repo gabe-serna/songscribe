@@ -14,7 +14,6 @@ interface AudioContextType {
   setAudioForm: React.Dispatch<React.SetStateAction<AudioFormData>>;
   audioStorage: AudioStorage | null;
   setAudioStorage: React.Dispatch<React.SetStateAction<AudioStorage | null>>;
-  tempo: MutableRefObject<number>;
   songName: MutableRefObject<string>;
 }
 
@@ -24,7 +23,6 @@ export const AudioContext = createContext<AudioContextType>({
   setAudioForm: () => {},
   audioStorage: null,
   setAudioStorage: () => {},
-  tempo: { current: 120 },
   songName: { current: "" },
 });
 
@@ -32,7 +30,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [audioForm, setAudioForm] = useState<AudioFormData>({});
   const [audioStorage, setAudioStorage] = useState<AudioStorage | null>(null);
   const songName = useRef("");
-  const tempo = useRef(120);
 
   return (
     <AudioContext.Provider
@@ -41,7 +38,6 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
         setAudioForm,
         audioStorage,
         setAudioStorage,
-        tempo,
         songName,
       }}
     >

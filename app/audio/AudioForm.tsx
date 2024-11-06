@@ -7,14 +7,18 @@ import AudioPart2 from "@/app/audio/AudioPart2";
 import AudioPart3 from "@/app/audio/AudioPart3";
 import getTempo from "@/utils/getTempo";
 import isolateAudio from "@/utils/isolateAudio";
+import getAudioFromURL from "@/utils/getAudioFromUrl";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AudioForm() {
-  const { audioForm, setAudioStorage, songName } = useContext(AudioContext);
+  const { audioForm, setAudioForm, setAudioStorage, songName } =
+    useContext(AudioContext);
   const isPart1Complete = audioForm.audio_file || audioForm.audio_link;
   const [isPart2Visible, setIsPart2Visible] = useState(false);
   const [isPart3Visible, setIsPart3Visible] = useState(false);
   const [isLoading, setisLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const part1Ref = useRef(null);
   const part2Ref = useRef(null);
@@ -32,34 +36,53 @@ export default function AudioForm() {
     // Set Tempo
     async function submitForm() {
       console.log("submitting form");
-      // // get file if yt url
-      // if (audioForm.audio_link && !audioForm.audio_file) {
-      //   //add things in here
-      // }
+      try {
+        // Get File if YT Link
+        let file = audioForm.audio_file;
+        if (audioForm.audio_link && !file) {
+          const formData = new FormData();
+          formData.append("youtube_url", audioForm.audio_link);
+          file = await getAudioFromURL(formData, setAudioForm);
+        }
 
-      // if (!audioForm.audio_file) return;
+        if (!file) {
+          setIsSubmitting(false);
+          throw new Error("No audio file provided");
+        }
+        console.log("audio retrieved: ", file.name);
 
-      // // Get Tempo
-      // if (!audioForm.tempo) {
-      //   audioForm.tempo = await getTempo(audioForm.audio_file);
-      // }
-      // console.log("tempo: ", audioForm.tempo);
-      // songName.current = file.name.split(".")[0];
+        // Get Tempo
+        let tempo = 120;
+        if (!audioForm.tempo) {
+          tempo = await getTempo(file);
+          setAudioForm({ ...audioForm, tempo });
+        } else tempo = audioForm.tempo;
+        console.log("tempo: ", tempo);
+        songName.current = file.name.split(".")[0];
 
-      // // Create Form Data
-      // const formData = new FormData();
-      // formData.append("audio_file", audioForm.audio_file);
-      // formData.append("separation_mode", `${audioForm.separation_mode}`);
-      // formData.append("tempo", `${audioForm.tempo}`);
-      // if (audioForm.start_time)
-      //   formData.append("start_time", `${audioForm.start_time}`);
-      // if (audioForm.end_time)
-      //   formData.append("end_time", `${audioForm.end_time}`);
+        // Create Form Data
+        const formData = new FormData();
+        formData.append("audio_file", file);
+        formData.append("separation_mode", `${audioForm.separation_mode}`);
+        formData.append("tempo", `${tempo}`);
+        if (audioForm.start_time)
+          formData.append("start_time", `${audioForm.start_time}`);
+        if (audioForm.end_time)
+          formData.append("end_time", `${audioForm.end_time}`);
 
-      // // Make API Request
-      // isolateAudio(formData, setAudioStorage).then(() => {
-      //   setIsSubmitting(false);
-      // });
+        // Make API Request
+        isolateAudio(formData, setAudioStorage).then(() => {
+          setIsSubmitting(false);
+        });
+      } catch (error) {
+        console.error(error);
+        setIsSubmitting(false);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Error Isolating Audio!",
+          description: "Make sure you have the backend running locally.",
+        });
+      }
     }
     submitForm();
   }, [isSubmitting]);

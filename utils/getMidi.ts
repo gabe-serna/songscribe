@@ -1,14 +1,13 @@
-import { MutableRefObject } from "react";
 import { AudioStorage, Stem, Tracks } from "./types";
 
 async function convertToMidi(
   stem: Stem,
-  tempo: MutableRefObject<number>,
+  tempo: number,
   download = false,
 ): Promise<Blob> {
   const formData = new FormData();
   formData.append("audio_file", stem.audioBlob);
-  formData.append("tempo", `${tempo.current}`);
+  formData.append("tempo", `${tempo}`);
   if (stem.name === "drums") formData.append("percussion", "true");
 
   const response = await fetch(
@@ -41,7 +40,7 @@ async function convertToMidi(
 export default async function handleMidiConversion(
   audioStorage: AudioStorage | null,
   setAudioStorage: React.Dispatch<React.SetStateAction<AudioStorage | null>>,
-  tempo: MutableRefObject<number>,
+  tempo: number,
 ): Promise<boolean> {
   if (!audioStorage) return false;
   const needsMidi: Stem[] = [];

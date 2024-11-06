@@ -9,7 +9,7 @@ import AudioForm from "./AudioForm";
 import handleMidiConversion from "@/utils/getMidi";
 
 export default function Page() {
-  const { audioStorage, setAudioStorage, tempo, songName } =
+  const { audioForm, audioStorage, setAudioStorage, songName } =
     useContext(AudioContext);
   const [flatScore, setFlatScore] = useState<string | null>(null);
   const [isMidiComplete, setIsMidiComplete] = useState(false);
@@ -17,13 +17,15 @@ export default function Page() {
 
   // Convert to Midi
   useEffect(() => {
-    handleMidiConversion(audioStorage, setAudioStorage, tempo).then(
-      (isComplete) => {
-        if (isComplete) {
-          setIsMidiComplete(true);
-        }
-      },
-    );
+    handleMidiConversion(
+      audioStorage,
+      setAudioStorage,
+      audioForm.tempo as number,
+    ).then((isComplete) => {
+      if (isComplete) {
+        setIsMidiComplete(true);
+      }
+    });
   }, [audioStorage]);
 
   // Create Flat Score
@@ -78,7 +80,7 @@ export default function Page() {
         )}
       {isMidiComplete && (
         <MergeMidiButton
-          tempo={tempo.current}
+          tempo={audioForm.tempo as number}
           audioStorage={audioStorage}
           songName={songName.current}
           setFlatScore={setFlatScore}

@@ -49,7 +49,7 @@ const formSchema = z.object({
 });
 
 export default function AudioForm() {
-  const { setAudioStorage, songName, tempo } = useContext(AudioContext);
+  const { setAudioStorage, songName } = useContext(AudioContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -69,16 +69,17 @@ export default function AudioForm() {
     songName.current = file.name.split(".")[0];
 
     // Set Tempo
-    if (!values.tempo) {
-      tempo.current = await getTempo(file);
-    } else tempo.current = values.tempo;
-    console.log("tempo: ", tempo.current);
+    const tempo = 120;
+    // if (!values.tempo) {
+    //   tempo.current = await getTempo(file);
+    // } else tempo.current = values.tempo;
+    // console.log("tempo: ", tempo.current);
 
     // Create Form Data
     const formData = new FormData();
     formData.append("audio_file", file);
     formData.append("separation_mode", values.separation_mode);
-    formData.append("tempo", `${tempo.current}`);
+    formData.append("tempo", `${120}`);
     if (values.start_time)
       formData.append("start_time", `${values.start_time}`);
     if (values.end_time) formData.append("end_time", `${values.end_time}`);
