@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import { AudioContext } from "@/app/audio/AudioProvider";
 import AudioPart1 from "@/app/audio/AudioPart1";
@@ -15,6 +15,11 @@ export default function AudioForm() {
   const [isPart3Visible, setIsPart3Visible] = useState(false);
   const [isLoading, setisLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const part1Ref = useRef(null);
+  const part2Ref = useRef(null);
+  const part3Ref = useRef(null);
+  const loadingRef = useRef(null);
 
   useEffect(() => {
     if (audioForm.separation_mode) setIsPart2Visible(false);
@@ -62,13 +67,17 @@ export default function AudioForm() {
   return (
     <div className="flex h-max">
       <CSSTransition
+        nodeRef={part1Ref}
         in={!isPart1Complete}
         timeout={700}
         classNames="fade"
         unmountOnExit
         onExited={() => setIsPart2Visible(true)}
       >
-        <div className="flex flex-col items-center justify-center space-y-16">
+        <div
+          ref={part1Ref}
+          className="flex flex-col items-center justify-center space-y-16"
+        >
           <h1 className="w-[15ch] text-center text-3xl font-bold lg:w-auto lg:text-4xl">
             The fastest way to turn any song into sheet music
           </h1>
@@ -77,13 +86,17 @@ export default function AudioForm() {
       </CSSTransition>
 
       <CSSTransition
+        nodeRef={part2Ref}
         in={isPart2Visible}
         timeout={700}
         classNames="fade"
         onExited={() => setIsPart3Visible(true)}
         unmountOnExit
       >
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div
+          ref={part2Ref}
+          className="flex flex-col items-center justify-center space-y-4"
+        >
           <h1 className="text-center text-3xl font-bold lg:text-4xl">
             Choose Isolation Mode
           </h1>
@@ -92,13 +105,17 @@ export default function AudioForm() {
       </CSSTransition>
 
       <CSSTransition
+        nodeRef={part3Ref}
         in={isPart3Visible}
         timeout={700}
         classNames="fade"
         onExited={() => setisLoading(true)}
         unmountOnExit
       >
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div
+          ref={part3Ref}
+          className="flex flex-col items-center justify-center space-y-4"
+        >
           <h1 className="text-center text-3xl font-bold lg:text-4xl">
             Customize Optional Parameters
           </h1>
@@ -107,12 +124,16 @@ export default function AudioForm() {
       </CSSTransition>
 
       <CSSTransition
+        nodeRef={loadingRef}
         in={isLoading}
         timeout={700}
         classNames="fade"
         unmountOnExit
       >
-        <div className="flex flex-col items-center justify-center space-y-4">
+        <div
+          ref={loadingRef}
+          className="flex flex-col items-center justify-center space-y-4"
+        >
           <h1 className="text-center text-3xl font-bold lg:text-4xl">
             Loading...
           </h1>

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { AudioContext } from "@/app/audio/AudioProvider";
 import type { SeparationMode } from "@/utils/types";
@@ -11,6 +11,10 @@ export default function AudioPart2() {
   const { audioForm, setAudioForm } = useContext(AudioContext);
   const [hoveredMode, setHoveredMode] = useState<SeparationMode | null>(null);
   const [selectedMode, setSelectedMode] = useState<SeparationMode | null>(null);
+
+  const modeRefs = useRef<Array<React.RefObject<HTMLDivElement>>>(
+    modes.map(() => React.createRef<HTMLDivElement>()),
+  ).current;
 
   function handleModeSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,12 +32,14 @@ export default function AudioPart2() {
       <TransitionGroup component={null} appear>
         {modes.map((mode, index) => (
           <CSSTransition
+            nodeRef={modeRefs[index]}
             in={selectedMode != null}
             key={mode}
             timeout={700 + index * 200}
             classNames="fade"
           >
             <ModeSelector
+              ref={modeRefs[index]}
               index={index}
               mode={mode}
               selectedMode={selectedMode}

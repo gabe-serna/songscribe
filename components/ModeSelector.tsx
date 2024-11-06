@@ -2,6 +2,7 @@ import Bass from "@/components/Bass";
 import { AudioLines, Check, Drum, Guitar, MicVocal, Piano } from "lucide-react";
 import type { SeparationMode } from "@/utils/types";
 import { Badge } from "@/components/ui/badge";
+import { forwardRef } from "react";
 
 const iconMap = {
   AudioLines,
@@ -52,56 +53,56 @@ interface Props {
   setHoveredMode: (mode: SeparationMode | null) => void;
 }
 
-export default function ModeSelector({
-  index,
-  mode,
-  selectedMode,
-  setSelectedMode,
-  hoveredMode,
-  setHoveredMode,
-}: Props) {
-  const { title, iconNames } = modeData[mode];
-  const isSelected = selectedMode === mode;
-  const figureClass = isSelected
-    ? `${figureClassName} ${selectedClassName}`
-    : `${figureClassName} outline-transparent `;
-  const opacity =
-    hoveredMode !== null && hoveredMode !== mode ? "opacity-30" : "";
+const ModeSelector = forwardRef<HTMLDivElement, Props>(
+  (
+    { index, mode, selectedMode, setSelectedMode, hoveredMode, setHoveredMode },
+    ref,
+  ) => {
+    const { title, iconNames } = modeData[mode];
+    const isSelected = selectedMode === mode;
+    const figureClass = isSelected
+      ? `${figureClassName} ${selectedClassName}`
+      : `${figureClassName} outline-transparent `;
+    const opacity =
+      hoveredMode !== null && hoveredMode !== mode ? "opacity-30" : "";
 
-  return (
-    <div
-      onMouseEnter={() => {
-        if (!selectedMode) {
-          setHoveredMode(mode);
-        }
-      }}
-      onMouseLeave={() => {
-        if (!selectedMode) {
-          setHoveredMode(null);
-        }
-      }}
-      style={{ transitionDelay: `${index * 200}ms` }}
-      className="w-full py-4 lg:w-3/4"
-    >
-      <figure
-        onClick={() => {
-          if (selectedMode === mode) {
-            setSelectedMode(null);
-          } else {
-            setSelectedMode(mode);
+    return (
+      <div
+        onMouseEnter={() => {
+          if (!selectedMode) {
             setHoveredMode(mode);
           }
         }}
-        className={`${figureClass}${opacity}`}
+        onMouseLeave={() => {
+          if (!selectedMode) {
+            setHoveredMode(null);
+          }
+        }}
+        style={{ transitionDelay: `${index * 200}ms` }}
+        className="w-full py-4 lg:w-3/4"
       >
-        <figcaption className={figcaptionClassName}>{title}</figcaption>
-        <div className={iconContainerClassName}>
-          {iconNames.map((iconName) => {
-            const IconComponent = iconMap[iconName];
-            return <IconComponent className={iconClassName} key={iconName} />;
-          })}
-        </div>
-      </figure>
-    </div>
-  );
-}
+        <figure
+          onClick={() => {
+            if (selectedMode === mode) {
+              setSelectedMode(null);
+            } else {
+              setSelectedMode(mode);
+              setHoveredMode(mode);
+            }
+          }}
+          className={`${figureClass}${opacity}`}
+        >
+          <figcaption className={figcaptionClassName}>{title}</figcaption>
+          <div className={iconContainerClassName}>
+            {iconNames.map((iconName) => {
+              const IconComponent = iconMap[iconName];
+              return <IconComponent className={iconClassName} key={iconName} />;
+            })}
+          </div>
+        </figure>
+      </div>
+    );
+  },
+);
+
+export default ModeSelector;
