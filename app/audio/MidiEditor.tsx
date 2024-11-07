@@ -23,6 +23,7 @@ import { runInContext } from "vm";
 import { Label } from "@/components/ui/label";
 import AudioMixer from "@/components/AudioMixer";
 import { Arc, Knob, Pointer, Value } from "rc-knob";
+import StyledKnob from "@/components/StyledKnob";
 
 export default function MidiEditor() {
   const { audioStorage } = useContext(AudioContext);
@@ -86,27 +87,9 @@ export default function MidiEditor() {
                 >
                   Audio Controls
                 </AccordionTrigger>
-                <AccordionContent className="flex h-72 flex-col gap-4 rounded-b-3xl border-2 border-t-0 border-border bg-card px-6 dark:bg-stone-900">
-                  <AudioMixer name="Midi Audio" />
-                  <Knob
-                    size={100}
-                    angleOffset={220}
-                    angleRange={280}
-                    steps={10}
-                    snap={true}
-                    min={0}
-                    max={100}
-                    // onChange={(value) => console.log(value)}
-                  >
-                    <Arc arcWidth={5} color="#FC5A96" radius={47.5} />
-                    <Pointer
-                      width={5}
-                      radius={40}
-                      type="circle"
-                      color="#FC5A96"
-                    />
-                    <Value marginBottom={40} className="value" />
-                  </Knob>
+                <AccordionContent className="flex h-72 flex-row items-center justify-around gap-4 rounded-b-3xl border-2 border-t-0 border-border bg-card px-6 dark:bg-stone-900">
+                  <AudioMixer name="Midi" />
+                  <AudioMixer name="Original" />
                 </AccordionContent>
               </AccordionItem>
             </div>
