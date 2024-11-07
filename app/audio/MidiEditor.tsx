@@ -19,32 +19,32 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Slider } from "@/components/ui/slider";
+import { runInContext } from "vm";
+import { Label } from "@/components/ui/label";
+import AudioMixer from "@/components/AudioMixer";
+import { Arc, Knob, Pointer, Value } from "rc-knob";
 
 export default function MidiEditor() {
   const { audioStorage } = useContext(AudioContext);
   const midiAdjustments = useRef<HTMLButtonElement>(null);
   const audioControls = useRef<HTMLButtonElement>(null);
-  const [controlsOpen, setControlsOpen] = useState(false);
+  const [midiOpen, setMidiOpen] = useState(false);
+  // const [controlsOpen, setControlsOpen] = useState(false);
 
   const handleOpen: MouseEventHandler<HTMLButtonElement> = (event) => {
     setTimeout(() => {
       if (!midiAdjustments.current || !audioControls.current) return;
-      console.log(
-        midiAdjustments.current.dataset.state,
-        audioControls.current.dataset.state,
-      );
-      if (
-        midiAdjustments.current.dataset.state === "open" ||
-        audioControls.current.dataset.state === "open"
-      ) {
-        setControlsOpen(true);
-      } else setControlsOpen(false);
+      // if (
+      //   midiAdjustments.current.dataset.state === "open" ||
+      //   audioControls.current.dataset.state === "open"
+      // ) {
+      //   setControlsOpen(true);
+      // } else setControlsOpen(false);
+
+      if (midiAdjustments.current.dataset.state === "open") setMidiOpen(true);
+      else setMidiOpen(false);
     }, 50);
   };
-
-  useEffect(() => {
-    console.log("controlsOpen", controlsOpen);
-  }, [controlsOpen]);
 
   return Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
     ([key, stem]) => {
@@ -63,7 +63,9 @@ export default function MidiEditor() {
             className="flex h-[565.6px] flex-col justify-between"
             collapsible
           >
-            <div className="flex flex-col space-y-4">
+            <div
+              className={`flex flex-col justify-between space-y-4 ${midiOpen ? "h-[565.6px]" : ""}`}
+            >
               <AccordionItem value="midi-adjustments">
                 <AccordionTrigger
                   ref={midiAdjustments}
@@ -84,18 +86,32 @@ export default function MidiEditor() {
                 >
                   Audio Controls
                 </AccordionTrigger>
-                <AccordionContent className="flex h-32 flex-col gap-4 rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
-                  <Slider
-                    orientation="vertical"
-                    max={100}
+                <AccordionContent className="flex h-72 flex-col gap-4 rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
+                  {/* <AudioMixer name="Midi Audio" /> */}
+                  {/* knob inside of the accordion content does not work because of the -translate-y-10 class */}
+                  <Knob
+                    size={100}
+                    angleOffset={220}
+                    angleRange={280}
+                    steps={10}
+                    snap={true}
                     min={0}
-                    defaultValue={[50]}
-                    className=""
-                  />
+                    max={100}
+                    // onChange={(value) => console.log(value)}
+                  >
+                    <Arc arcWidth={5} color="#FC5A96" radius={47.5} />
+                    <Pointer
+                      width={5}
+                      radius={40}
+                      type="circle"
+                      color="#FC5A96"
+                    />
+                    <Value marginBottom={40} className="value" />
+                  </Knob>
                 </AccordionContent>
               </AccordionItem>
             </div>
-            {!controlsOpen && (
+            {!midiOpen && (
               <div className="flex flex-col space-y-4">
                 <AccordionItem
                   value="next"
