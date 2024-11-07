@@ -14,10 +14,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import MidiAdjustment from "@/components/MidiAdjustment";
-import { Button } from "@/components/ui/button";
+import MidiAdjustments from "@/components/MidiAdjustments";
 
 export default function Page() {
   const { audioForm, audioStorage, setAudioStorage, songName } =
@@ -97,55 +94,7 @@ export default function Page() {
                       Midi Adjustments
                     </AccordionTrigger>
                     <AccordionContent className="rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
-                      <form className="flex flex-col gap-4">
-                        <MidiAdjustment
-                          name="Minimum Note Length"
-                          defaultValue={130}
-                          max={500}
-                          min={0}
-                          step={20}
-                        />
-                        <MidiAdjustment
-                          name="Minimum Frequency"
-                          defaultValue={0}
-                          max={5000}
-                          min={0}
-                          step={100}
-                        />
-                        <MidiAdjustment
-                          name="Maximum Frequency"
-                          defaultValue={18000}
-                          max={18000}
-                          min={8000}
-                          step={200}
-                        />
-                        <MidiAdjustment
-                          name="Note Segmentation"
-                          defaultValue={0.5}
-                          max={0.95}
-                          min={0.05}
-                          step={0.05}
-                        />
-                        <MidiAdjustment
-                          name="Confidence Threshold"
-                          defaultValue={0.3}
-                          max={0.95}
-                          min={0.05}
-                          step={0.05}
-                        />
-                        <Button
-                          size="sm"
-                          className="button-secondary rounded-3xl border-2 border-border font-semibold"
-                        >
-                          Reset
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="button-primary rounded-3xl font-semibold"
-                        >
-                          Regenerate Midi
-                        </Button>
-                      </form>
+                      <MidiAdjustments />
                     </AccordionContent>
                   </AccordionItem>
                   <div>
