@@ -6,8 +6,8 @@
   :root {
     --background: 50 10% 92%;
     --foreground: 0 0% 3.9%;
-    --card: 60 5% 96%;
-    --card-foreground: 0 0% 3.9%;
+    --card: 0 0% 89.8%;
+    --card-foreground: 25 5% 45%;
     --popover: 60 5% 96%;
     --popover-foreground: 0 0% 3.9%;
     --primary: 0 0% 9%;
@@ -34,8 +34,8 @@
   .dark {
     --background: 12 6% 15%;
     --foreground: 60 5% 96%;
-    --card: 12 6% 15%;
-    --card-foreground: 60 5% 96%;
+    --card: 12 7% 15%;
+    --card-foreground: 24 5% 64%;
     --popover: 12 6% 15%;
     --popover-foreground: 60 5% 96%;
     --primary: 60 5% 96%;
@@ -112,24 +112,11 @@ a,
   @apply -translate-y-4 opacity-0;
 }
 
-/* Define the keyframes for the fade-in-up animation */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.button-primary {
+  @apply bg-stone-600 text-background hover:bg-stone-700 dark:bg-stone-300 dark:hover:bg-stone-50;
 }
-
-/* Apply the animation */
-.animate-fade-in-up {
-  animation-name: fade-in-up;
-  animation-duration: 700ms;
-  animation-fill-mode: both;
-  animation-timing-function: ease-in-out;
+.button-secondary {
+  @apply bg-accent text-foreground hover:bg-stone-100 dark:hover:bg-stone-800;
 }
 
 @layer utilities {

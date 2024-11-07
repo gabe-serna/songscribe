@@ -16,6 +16,8 @@ import {
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import MidiAdjustment from "@/components/MidiAdjustment";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
   const { audioForm, audioStorage, setAudioStorage, songName } =
@@ -71,7 +73,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="flex w-min flex-col justify-around">
+    <div className="flex flex-col justify-around">
       {!audioStorage && <AudioForm />}
       {audioStorage &&
         Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
@@ -87,99 +89,75 @@ export default function Page() {
                 />
                 <Accordion
                   type="single"
-                  className="mt-12 flex h-[517.6px] flex-col justify-between"
+                  className="flex h-[565.6px] flex-col justify-between"
                   collapsible
                 >
                   <AccordionItem value="midi-adjustments">
                     <AccordionTrigger className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6">
                       Midi Adjustments
                     </AccordionTrigger>
-                    <AccordionContent className="flex flex-col gap-4 rounded-3xl border-2 border-border bg-input px-6 dark:bg-stone-900">
-                      <form>
-                        <Label htmlFor="note_length">Minimum Note Length</Label>
-                        <div className="flex h-max items-center justify-center gap-4 *:mt-1">
-                          <Slider
-                            name="note_length"
-                            defaultValue={[130]}
-                            max={500}
-                            min={0}
-                            step={20}
-                          />
-                          <p className="text-stone-400">130</p>
-                        </div>
-                      </form>
-                      <form>
-                        <Label htmlFor="minimum_frequency">
-                          Minimum Frequency
-                        </Label>
-                        <div className="flex h-max items-center justify-center gap-4 *:mt-1">
-                          <Slider
-                            name="minimum_frequency"
-                            defaultValue={[0]}
-                            max={5000}
-                            min={0}
-                            step={100}
-                          />
-                          <p className="text-stone-400">0</p>
-                        </div>
-                      </form>
-                      <form>
-                        <Label htmlFor="maximum_frequency">
-                          Maximum Frequency
-                        </Label>
-                        <div className="flex h-max items-center justify-center gap-4 *:mt-1">
-                          <Slider
-                            name="maximum_frequency"
-                            defaultValue={[18000]}
-                            max={18000}
-                            min={8000}
-                            step={200}
-                          />
-                          <p className="text-stone-400">1800</p>
-                        </div>
-                      </form>
-                      <form>
-                        <Label htmlFor="note_segmentation">
-                          Note Segmentation
-                        </Label>
-                        <div className="flex h-max items-center justify-center gap-4 *:mt-1">
-                          <Slider
-                            name="note_segmentation"
-                            defaultValue={[0.5]}
-                            max={0.95}
-                            min={0.05}
-                            step={0.05}
-                          />
-                          <p className="text-stone-400">1800</p>
-                        </div>
-                      </form>
-                      <form>
-                        <Label htmlFor="confidence_threshold">
-                          Note Segmentation
-                        </Label>
-                        <div className="flex h-max items-center justify-center gap-4 *:mt-1">
-                          <Slider
-                            name="confidence_threshold"
-                            defaultValue={[0.3]}
-                            max={0.95}
-                            min={0.05}
-                            step={0.05}
-                          />
-                          <p className="text-stone-400">1800</p>
-                        </div>
+                    <AccordionContent className="rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
+                      <form className="flex flex-col gap-4">
+                        <MidiAdjustment
+                          name="Minimum Note Length"
+                          defaultValue={130}
+                          max={500}
+                          min={0}
+                          step={20}
+                        />
+                        <MidiAdjustment
+                          name="Minimum Frequency"
+                          defaultValue={0}
+                          max={5000}
+                          min={0}
+                          step={100}
+                        />
+                        <MidiAdjustment
+                          name="Maximum Frequency"
+                          defaultValue={18000}
+                          max={18000}
+                          min={8000}
+                          step={200}
+                        />
+                        <MidiAdjustment
+                          name="Note Segmentation"
+                          defaultValue={0.5}
+                          max={0.95}
+                          min={0.05}
+                          step={0.05}
+                        />
+                        <MidiAdjustment
+                          name="Confidence Threshold"
+                          defaultValue={0.3}
+                          max={0.95}
+                          min={0.05}
+                          step={0.05}
+                        />
+                        <Button
+                          size="sm"
+                          className="button-secondary rounded-3xl border-2 border-border font-semibold"
+                        >
+                          Reset
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="button-primary rounded-3xl font-semibold"
+                        >
+                          Regenerate Midi
+                        </Button>
                       </form>
                     </AccordionContent>
                   </AccordionItem>
                   <div>
                     <AccordionItem
                       value="next"
-                      className="flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border bg-accent px-6 py-2 text-base font-semibold text-foreground"
+                      className="button-secondary flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base font-semibold transition-colors"
                     >
                       Back <ArrowLeft className="size-4" />
                     </AccordionItem>
                     <AccordionItem
                       value="next"
-                      className="mt-4 flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl bg-stone-600 px-6 py-2 text-base font-semibold text-background dark:bg-stone-300"
+                      className="button-primary mt-4 flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base font-semibold transition-colors"
                     >
                       Next <ArrowRight className="size-4" />
                     </AccordionItem>
