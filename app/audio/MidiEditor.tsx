@@ -70,11 +70,11 @@ export default function MidiEditor() {
                 <AccordionTrigger
                   ref={midiAdjustments}
                   onClick={handleOpen}
-                  className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6"
+                  className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6 data-[state=open]:rounded-b-none"
                 >
                   Midi Adjustments
                 </AccordionTrigger>
-                <AccordionContent className="rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
+                <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-border bg-card px-6 dark:bg-stone-900">
                   <MidiAdjustments />
                 </AccordionContent>
               </AccordionItem>
@@ -82,13 +82,12 @@ export default function MidiEditor() {
                 <AccordionTrigger
                   ref={audioControls}
                   onClick={handleOpen}
-                  className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6"
+                  className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6 data-[state=open]:rounded-b-none"
                 >
                   Audio Controls
                 </AccordionTrigger>
-                <AccordionContent className="flex h-72 flex-col gap-4 rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
-                  {/* <AudioMixer name="Midi Audio" /> */}
-                  {/* knob inside of the accordion content does not work because of the -translate-y-10 class */}
+                <AccordionContent className="flex h-72 flex-col gap-4 rounded-b-3xl border-2 border-t-0 border-border bg-card px-6 dark:bg-stone-900">
+                  <AudioMixer name="Midi Audio" />
                   <Knob
                     size={100}
                     angleOffset={220}

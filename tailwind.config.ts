@@ -65,17 +65,21 @@ const config = {
         "accordion-down": {
           from: {
             height: "0",
+            transform: "translateY(-20px)",
           },
           to: {
             height: "var(--radix-accordion-content-height)",
+            transform: "translateY(0)",
           },
         },
         "accordion-up": {
           from: {
             height: "var(--radix-accordion-content-height)",
+            transform: "translateY(0)",
           },
           to: {
             height: "0",
+            transform: "translateY(-20px)",
           },
         },
       },
