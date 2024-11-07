@@ -1,6 +1,12 @@
 "use client";
 
-import { useContext, useEffect, useRef, useState } from "react";
+import {
+  MouseEventHandler,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AudioContext } from "./AudioProvider";
 import { AudioStorage, Stem } from "@/utils/types";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -12,14 +18,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Slider } from "@/components/ui/slider";
 
 export default function MidiEditor() {
   const { audioStorage } = useContext(AudioContext);
-  const midiAdjustments = useRef<HTMLDivElement>(null);
-  const audioControls = useRef<HTMLDivElement>(null);
+  const midiAdjustments = useRef<HTMLButtonElement>(null);
+  const audioControls = useRef<HTMLButtonElement>(null);
   const [controlsOpen, setControlsOpen] = useState(false);
 
-  const handleOpen = (_event: React.MouseEvent<HTMLDivElement>) => {
+  const handleOpen: MouseEventHandler<HTMLButtonElement> = (event) => {
     setTimeout(() => {
       if (!midiAdjustments.current || !audioControls.current) return;
       console.log(
@@ -57,28 +64,34 @@ export default function MidiEditor() {
             collapsible
           >
             <div className="flex flex-col space-y-4">
-              <AccordionItem
-                ref={midiAdjustments}
-                onClick={handleOpen}
-                value="midi-adjustments"
-              >
-                <AccordionTrigger className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6">
+              <AccordionItem value="midi-adjustments">
+                <AccordionTrigger
+                  ref={midiAdjustments}
+                  onClick={handleOpen}
+                  className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6"
+                >
                   Midi Adjustments
                 </AccordionTrigger>
                 <AccordionContent className="rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
                   <MidiAdjustments />
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem
-                ref={audioControls}
-                onClick={handleOpen}
-                value="audio-controls"
-              >
-                <AccordionTrigger className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6">
+              <AccordionItem value="audio-controls">
+                <AccordionTrigger
+                  ref={audioControls}
+                  onClick={handleOpen}
+                  className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6"
+                >
                   Audio Controls
                 </AccordionTrigger>
-                <AccordionContent className="flex flex-col gap-4 rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
-                  audio
+                <AccordionContent className="flex h-32 flex-col gap-4 rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
+                  <Slider
+                    orientation="vertical"
+                    max={100}
+                    min={0}
+                    defaultValue={[50]}
+                    className=""
+                  />
                 </AccordionContent>
               </AccordionItem>
             </div>
