@@ -75,7 +75,7 @@ export default function MidiEditor() {
                 >
                   Midi Adjustments
                 </AccordionTrigger>
-                <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-border bg-card px-6 dark:bg-stone-900">
+                <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-stone-400 bg-stone-200 px-6 dark:bg-popover">
                   <MidiAdjustments />
                 </AccordionContent>
               </AccordionItem>
@@ -87,7 +87,7 @@ export default function MidiEditor() {
                 >
                   Audio Controls
                 </AccordionTrigger>
-                <AccordionContent className="flex h-72 flex-row items-center justify-around gap-4 rounded-b-3xl border-2 border-t-0 border-border bg-card px-6 dark:bg-stone-900">
+                <AccordionContent className="flex h-72 flex-row items-center justify-around gap-4 rounded-b-3xl border-2 border-t-0 border-border bg-card px-6 dark:bg-popover">
                   <AudioMixer name="Midi" />
                   <AudioMixer name="Original" />
                 </AccordionContent>
