@@ -1,20 +1,10 @@
 "use client";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
-import MergeMidiButton from "@/components/MergeMidiButton";
-import { AudioStorage, Stem } from "@/utils/types";
 import { AudioContext } from "./AudioProvider";
 import AudioForm from "./AudioForm";
 import handleMidiConversion from "@/utils/getMidi";
-import AudioMidiVisualizer from "@/components/AudioMidiVisualizer";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import MidiAdjustments from "@/components/MidiAdjustments";
+import MidiEditor from "./MidiEditor";
 
 export default function Page() {
   const { audioForm, audioStorage, setAudioStorage, songName } =
@@ -72,56 +62,7 @@ export default function Page() {
   return (
     <div className="flex flex-col justify-around">
       {!audioStorage && <AudioForm />}
-      {audioStorage &&
-        Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
-          ([key, stem]) => {
-            if (!stem.midiBlob) return;
-            return (
-              <div className="flex w-min items-start justify-center space-x-12">
-                <AudioMidiVisualizer
-                  key={key}
-                  name={stem.name}
-                  audioBlob={stem.audioBlob}
-                  midiFile={stem.midiBlob}
-                />
-                <Accordion
-                  type="single"
-                  className="flex h-[565.6px] flex-col justify-between"
-                  collapsible
-                >
-                  <AccordionItem value="midi-adjustments">
-                    <AccordionTrigger className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6">
-                      Midi Adjustments
-                    </AccordionTrigger>
-                    <AccordionContent className="rounded-3xl border-2 border-border bg-card px-6 dark:bg-stone-900">
-                      <MidiAdjustments />
-                    </AccordionContent>
-                  </AccordionItem>
-                  <div>
-                    <AccordionItem
-                      value="next"
-                      className="button-secondary flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base font-semibold transition-colors"
-                    >
-                      Back <ArrowLeft className="size-4" />
-                    </AccordionItem>
-                    <AccordionItem
-                      value="next"
-                      className="button-primary mt-4 flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base font-semibold transition-colors"
-                    >
-                      Next <ArrowRight className="size-4" />
-                    </AccordionItem>
-                    {/* <AccordionItem
-                      value="next"
-                      className="mt-4 flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl bg-yellow-400 px-6 py-2 text-base font-semibold text-foreground dark:bg-yellow-600 dark:text-background"
-                    >
-                      Export
-                    </AccordionItem> */}
-                  </div>
-                </Accordion>
-              </div>
-            );
-          },
-        )}
+      {audioStorage && <MidiEditor />}
       {/* {isMidiComplete && (
         <MergeMidiButton
           tempo={audioForm.tempo as number}
