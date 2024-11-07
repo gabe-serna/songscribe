@@ -244,7 +244,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
         style={{ height: containerHeight }}
       >
         <div
-          className="piano-roll-container flex"
+          className="piano-roll-container flex overflow-hidden rounded-2xl"
           style={{ position: "relative" }}
         >
           {/* Piano Keys Container */}
