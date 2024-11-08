@@ -1,11 +1,13 @@
 "use client";
 
+import synthInit from "@/utils/synthInit";
 import { useTheme } from "next-themes";
 import React, { useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import { Midi } from "tonejs-midi-fix";
 
 interface PianoRollProps {
+  title: string;
   midiFile: Blob;
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
@@ -22,6 +24,7 @@ interface MidiNote {
 }
 
 const PianoRoll: React.FC<PianoRollProps> = ({
+  title,
   midiFile,
   isPlaying,
   setIsPlaying,
@@ -175,17 +178,23 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     }
 
     // Initialize individual synths
-    const polySynth = new Tone.PolySynth().connect(audioControllerRef.current);
+    const {
+      defaultSynth,
+      kickSynth,
+      tomSynth,
+      snareSynth,
+      hihatSynth,
+      crashSynth,
+    } = synthInit(
+      audioControllerRef as React.MutableRefObject<Tone.PanVol>,
+      title,
+    );
 
-    const kickSynth = new Tone.Player("/audio/kick-sample.mp3").toDestination();
-
-    const snareSynth = new Tone.Player(
-      "/audio/snare-sample.mp3",
-    ).toDestination();
-
-    const hihatSynth = new Tone.Player(
-      "/audio/hihat-sample.mp3",
-    ).toDestination();
+    kickSynth.autostart = isPercussion.current;
+    tomSynth.autostart = isPercussion.current;
+    snareSynth.autostart = isPercussion.current;
+    hihatSynth.autostart = isPercussion.current;
+    crashSynth.autostart = isPercussion.current;
 
     const transport = Tone.getTransport();
     const startTime = getScrollTime(progress, duration);
@@ -195,28 +204,31 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
     // Schedule each note
     midiData.forEach((note) => {
-      let synth: Tone.PolySynth | Tone.Player;
+      let synth: Tone.PolySynth | Tone.Player | Tone.Sampler;
       let time = note.time - startTime;
-      if (time < 0) time = 0;
 
       if (isPercussion.current) {
         switch (note.note) {
-          case "B2": // Kick Drum
           case "B3":
             synth = kickSynth;
             break;
-          case "D2": // Snare Drum
+          case "D2":
             synth = snareSynth;
             break;
-          case "F#2": // Closed Hi-Hat
-          case "C#3": // Open Hi-Hat
+          case "B2":
+            synth = tomSynth;
+            break;
+          case "F#2":
             synth = hihatSynth;
             break;
+          case "C#3":
+            synth = crashSynth;
+            break;
           default:
-            synth = kickSynth; // Default to Kick if not matched
+            synth = kickSynth;
         }
       } else {
-        synth = polySynth;
+        synth = defaultSynth;
       }
 
       const duration = Math.max(note.duration, 0.01);
@@ -224,10 +236,6 @@ const PianoRoll: React.FC<PianoRollProps> = ({
         if (synth instanceof Tone.Player) {
           synth.start(t);
         } else {
-          // if (synth instanceof Tone.NoiseSynth) {
-          //   console.log("Noise Synth");
-          //   synth.triggerAttackRelease(note.note, duration, t);
-          // }
           synth.triggerAttackRelease(note.note, duration, t);
         }
       }, time);

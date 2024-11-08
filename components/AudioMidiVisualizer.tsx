@@ -195,6 +195,7 @@ export default function AudioMidiVisualizer({
       <div className="mt-4">
         {duration !== null && (
           <PianoRoll
+            title={title}
             midiFile={midiFile}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
