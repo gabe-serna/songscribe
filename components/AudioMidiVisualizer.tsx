@@ -4,6 +4,7 @@ import PianoRoll from "@/components/PianoRoll";
 import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
+import { Skeleton } from "./ui/skeleton";
 
 interface Controls {
   volume: number;
@@ -193,7 +194,7 @@ export default function AudioMidiVisualizer({
     <div className="flex h-full w-[1000px] flex-col justify-center">
       <h1 className="text-2xl font-bold">{title}</h1>
       <div className="mt-4">
-        {duration !== null && (
+        {duration !== null && midiFile ? (
           <PianoRoll
             title={title}
             midiFile={midiFile}
@@ -204,6 +205,13 @@ export default function AudioMidiVisualizer({
             volume={midiVol}
             pan={midiPan}
           />
+        ) : (
+          <Skeleton
+            className="mb-9 flex items-center justify-center rounded-2xl bg-accent text-card-foreground shadow-lg dark:shadow-stone-900"
+            style={{ height: 400 }}
+          >
+            Generating Midi...
+          </Skeleton>
         )}
       </div>
       <div className="mb-8 rounded-2xl bg-accent p-4 shadow-lg">

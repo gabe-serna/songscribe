@@ -353,7 +353,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
         </div>
       </div>
 
-      <div style={{ marginTop: "10px" }}>
+      <div className="mt-[10px]">
         <button onClick={isPlaying ? stopMidi : playMidi}>
           {isPlaying ? "Stop" : "Play"}
         </button>
