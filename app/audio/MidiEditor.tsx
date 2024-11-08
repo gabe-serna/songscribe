@@ -16,6 +16,7 @@ import AudioMixer from "@/components/AudioMixer";
 
 export default function MidiEditor() {
   const { audioStorage } = useContext(AudioContext);
+  const [selectedMidi, setSelectedMidi] = useState<number>(0);
   const midiAdjustments = useRef<HTMLButtonElement>(null);
   const audioControls = useRef<HTMLButtonElement>(null);
   const [midiOpen, setMidiOpen] = useState(false);
@@ -47,17 +48,24 @@ export default function MidiEditor() {
     }, 50);
   };
 
-  return Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
-    ([key, stem]) => {
-      if (!stem.midiBlob) return;
-      // add key
-      return (
-        <div className="flex w-min items-start justify-center space-x-12">
+  const storageArray = Object.entries(
+    audioStorage as Record<keyof AudioStorage, Stem>,
+  );
+  const key = storageArray[selectedMidi][0];
+  const isLastKey = selectedMidi === storageArray.length - 1;
+  const isFirstKey = selectedMidi === 0;
+  const stem = (audioStorage as Record<keyof AudioStorage, Stem>)[
+    key as keyof AudioStorage
+  ];
+
+  return (
+    <div className="flex w-min items-start justify-center space-x-12">
+      {stem.midiBlob && (
+        <>
           <AudioMidiVisualizer
-            key={key}
             name={stem.name}
             audioBlob={stem.audioBlob}
-            midiFile={stem.midiBlob}
+            midiFile={stem.midiBlob as Blob}
             controls={[midiControls, originalAudioControls]}
           />
           <Accordion
@@ -99,29 +107,36 @@ export default function MidiEditor() {
             </div>
             {!midiOpen && (
               <div className="flex flex-col space-y-4">
-                <AccordionItem
-                  value="next"
-                  className="button-secondary flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base font-semibold transition-colors"
-                >
-                  Back <ArrowLeft className="size-4" />
-                </AccordionItem>
-                <AccordionItem
-                  value="next"
-                  className="button-primary flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base font-semibold transition-colors"
-                >
-                  Next <ArrowRight className="size-4" />
-                </AccordionItem>
-                {/* <AccordionItem
-                value="next"
-                className="mt-4 flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl bg-yellow-400 px-6 py-2 text-base font-semibold text-foreground dark:bg-yellow-600 dark:text-background"
-              >
-                Export
-              </AccordionItem> */}
+                {!isFirstKey && (
+                  <AccordionItem
+                    value="next"
+                    onClick={() => setSelectedMidi(selectedMidi - 1)}
+                    className="button-secondary flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base font-semibold transition-colors"
+                  >
+                    Back <ArrowLeft className="size-4" />
+                  </AccordionItem>
+                )}
+                {!isLastKey ? (
+                  <AccordionItem
+                    value="next"
+                    onClick={() => setSelectedMidi(selectedMidi + 1)}
+                    className="button-primary flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base font-semibold transition-colors"
+                  >
+                    Next <ArrowRight className="size-4" />
+                  </AccordionItem>
+                ) : (
+                  <AccordionItem
+                    value="next"
+                    className="mt-4 flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl bg-yellow-400 px-6 py-2 text-base font-semibold text-foreground dark:bg-yellow-600 dark:text-background"
+                  >
+                    Export
+                  </AccordionItem>
+                )}
               </div>
             )}
           </Accordion>
-        </div>
-      );
-    },
+        </>
+      )}
+    </div>
   );
 }
