@@ -1,20 +1,21 @@
-// StyledKnob.tsx
-import React, { useState } from "react";
+import React from "react";
 import { Knob, Pointer } from "rc-knob";
 import { CustomArc } from "./CustomArc";
 
-const StyledKnob: React.FC = () => {
-  const [value, setValue] = useState<number>(0);
+interface Props {
+  value: number;
+  setValue: (value: number) => void;
+}
 
+const StyledKnob = ({ value, setValue }: Props) => {
   const min = -100;
   const max = 100;
-  const size = 40; // Desired knob size
-  const arcWidth = size * 0.15; // 10% of size = 5
-  const pointerSize = size * 0.08; // 10% of size = 5
+  const size = 40;
+  const arcWidth = size * 0.15;
+  const pointerSize = size * 0.08;
 
-  // Calculate radii
-  const arcRadius = size / 2 - arcWidth / 2; // 25 - 2.5 = 22.5
-  const pointerRadius = arcRadius - pointerSize; // 22.5 - 2.5 = 20
+  const arcRadius = size / 2 - arcWidth / 2;
+  const pointerRadius = arcRadius - pointerSize;
 
   return (
     <div className="mt-3 flex flex-col items-center">

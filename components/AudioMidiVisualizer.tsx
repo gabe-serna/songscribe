@@ -5,18 +5,35 @@ import { useWavesurfer } from "@wavesurfer/react";
 import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 
+interface Controls {
+  volume: number;
+  setVolume: (volume: number) => void;
+  pan: number;
+  setPan: (pan: number) => void;
+}
+
+interface Props {
+  name: string;
+  audioBlob: Blob;
+  midiFile: Blob;
+  controls: Controls[];
+}
+
 export default function AudioMidiVisualizer({
   name,
   audioBlob,
   midiFile,
-}: {
-  name: string;
-  audioBlob: Blob;
-  midiFile: Blob;
-}) {
+  controls,
+}: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const durationRef = useRef<number | null>(null);
   const lastRun = useRef(Date.now());
+  const { volume: midiVol, pan: midiPan } = controls[0];
+  const { volume: audioVol, pan: audioPan } = controls[1];
+
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const panNodeRef = useRef<StereoPannerNode | null>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -50,6 +67,66 @@ export default function AudioMidiVisualizer({
     normalize: true,
   });
 
+  // Set up the Web Audio API and connect pan node
+  useEffect(() => {
+    if (!wavesurfer || !isReady) return;
+
+    // Initialize Progress
+    setProgress(getProgressPercent(wavesurfer));
+    durationRef.current = wavesurfer.getDuration();
+    setProgress(0.1);
+
+    // Get the media element from wavesurfer
+    const audioElement = wavesurfer.getMediaElement();
+    if (!audioElement) {
+      console.error("No media element available");
+      return;
+    }
+
+    // Create AudioContext if not already created
+    if (!audioCtxRef.current) {
+      const audioCtx = new window.AudioContext();
+      audioCtxRef.current = audioCtx;
+
+      const sourceNode = audioCtx.createMediaElementSource(audioElement);
+      sourceNodeRef.current = sourceNode;
+
+      const panNode = audioCtx.createStereoPanner();
+      panNode.pan.value = audioPan / 100;
+      panNodeRef.current = panNode;
+
+      sourceNode.connect(panNode);
+      panNode.connect(audioCtx.destination);
+    }
+
+    // Resume AudioContext on user interaction
+    const resumeAudioContext = () => {
+      if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+    };
+
+    document.addEventListener("click", resumeAudioContext);
+
+    return () => {
+      document.removeEventListener("click", resumeAudioContext);
+    };
+  }, [wavesurfer, isReady, audioPan]);
+
+  // Update pan when audioPan changes
+  useEffect(() => {
+    if (panNodeRef.current) {
+      panNodeRef.current.pan.value = audioPan / 100;
+    }
+  }, [audioPan]);
+
+  // Update volume when audioVol changes
+  useEffect(() => {
+    if (wavesurfer) {
+      wavesurfer.setVolume(audioVol / 100);
+    }
+  }, [audioVol, wavesurfer]);
+
   wavesurfer?.on("timeupdate", () => {
     setProgress(getProgressPercent(wavesurfer));
   });
@@ -63,17 +140,6 @@ export default function AudioMidiVisualizer({
     setIsPlaying(false);
     setProgress(0);
   });
-
-  // Initialize Progress
-  useEffect(() => {
-    if (!isReady) return;
-    setProgress(getProgressPercent(wavesurfer));
-
-    // Ensure Midi and Audio have same duration
-    if (!wavesurfer) return;
-    durationRef.current = wavesurfer.getDuration();
-    setProgress(0.1);
-  }, [isReady]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -96,6 +162,8 @@ export default function AudioMidiVisualizer({
             setIsPlaying={setIsPlaying}
             progress={progress}
             duration={wavesurfer?.getDuration() as number}
+            volume={midiVol}
+            pan={midiPan}
           />
         )}
       </div>

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  MouseEventHandler,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { MouseEventHandler, useContext, useRef, useState } from "react";
 import { AudioContext } from "./AudioProvider";
 import { AudioStorage, Stem } from "@/utils/types";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -18,30 +12,36 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Slider } from "@/components/ui/slider";
-import { runInContext } from "vm";
-import { Label } from "@/components/ui/label";
 import AudioMixer from "@/components/AudioMixer";
-import { Arc, Knob, Pointer, Value } from "rc-knob";
-import StyledKnob from "@/components/StyledKnob";
 
 export default function MidiEditor() {
   const { audioStorage } = useContext(AudioContext);
   const midiAdjustments = useRef<HTMLButtonElement>(null);
   const audioControls = useRef<HTMLButtonElement>(null);
   const [midiOpen, setMidiOpen] = useState(false);
+
+  const [midiVolume, setMidiVolume] = useState(100);
+  const [midiPan, setMidiPan] = useState(0);
+  const midiControls = {
+    volume: midiVolume,
+    setVolume: setMidiVolume,
+    pan: midiPan,
+    setPan: setMidiPan,
+  };
+
+  const [audioVolume, setAudioVolume] = useState(100);
+  const [audioPan, setAudioPan] = useState(0);
+  const originalAudioControls = {
+    volume: audioVolume,
+    setVolume: setAudioVolume,
+    pan: audioPan,
+    setPan: setAudioPan,
+  };
   // const [controlsOpen, setControlsOpen] = useState(false);
 
-  const handleOpen: MouseEventHandler<HTMLButtonElement> = (event) => {
+  const handleOpen: MouseEventHandler<HTMLButtonElement> = (_event) => {
     setTimeout(() => {
       if (!midiAdjustments.current || !audioControls.current) return;
-      // if (
-      //   midiAdjustments.current.dataset.state === "open" ||
-      //   audioControls.current.dataset.state === "open"
-      // ) {
-      //   setControlsOpen(true);
-      // } else setControlsOpen(false);
-
       if (midiAdjustments.current.dataset.state === "open") setMidiOpen(true);
       else setMidiOpen(false);
     }, 50);
@@ -58,6 +58,7 @@ export default function MidiEditor() {
             name={stem.name}
             audioBlob={stem.audioBlob}
             midiFile={stem.midiBlob}
+            controls={[midiControls, originalAudioControls]}
           />
           <Accordion
             type="single"
@@ -75,7 +76,7 @@ export default function MidiEditor() {
                 >
                   Midi Adjustments
                 </AccordionTrigger>
-                <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-stone-400 bg-stone-200 px-6 dark:bg-popover">
+                <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-border bg-stone-200 px-6 dark:bg-popover">
                   <MidiAdjustments />
                 </AccordionContent>
               </AccordionItem>
@@ -88,8 +89,11 @@ export default function MidiEditor() {
                   Audio Controls
                 </AccordionTrigger>
                 <AccordionContent className="flex h-72 flex-row items-center justify-around gap-4 rounded-b-3xl border-2 border-t-0 border-border bg-card px-6 dark:bg-popover">
-                  <AudioMixer name="Midi" />
-                  <AudioMixer name="Original" />
+                  <AudioMixer name="Midi" controls={midiControls} />
+                  <AudioMixer
+                    name="Original"
+                    controls={originalAudioControls}
+                  />
                 </AccordionContent>
               </AccordionItem>
             </div>

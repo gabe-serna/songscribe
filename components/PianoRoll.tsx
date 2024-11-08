@@ -11,6 +11,8 @@ interface PianoRollProps {
   setIsPlaying: (isPlaying: boolean) => void;
   progress: number;
   duration: number;
+  volume: number;
+  pan: number;
 }
 
 interface MidiNote {
@@ -25,6 +27,8 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   setIsPlaying,
   progress,
   duration,
+  volume,
+  pan,
 }) => {
   const pianoKeysCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const notesCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -34,6 +38,8 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   const activeNotesRef = useRef<Set<string>>(new Set());
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const vol = getVolume(volume);
+  const panAmnt = pan / 100;
 
   const tempo = useRef(120);
 
@@ -157,7 +163,8 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   // Play MIDI
   const playMidi = async () => {
     await Tone.start();
-    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    const panVol = new Tone.PanVol(panAmnt, vol).toDestination();
+    const synth = new Tone.PolySynth(Tone.Synth).connect(panVol);
     const transport = Tone.getTransport();
     const startTime = getScrollTime(progress, duration);
 
@@ -313,4 +320,19 @@ function getScrollTime(
 ): number {
   const currentTimeInSeconds = (scrollPercentage / 100) * totalDuration;
   return currentTimeInSeconds;
+}
+
+function getVolume(input: number): number {
+  if (input < 0 || input > 100) {
+    throw new Error("Input must be between 0 and 100");
+  }
+
+  const minOutput = -30;
+  const maxOutput = 0;
+
+  // Calculate the mapped value
+  const mappedValue = (input / 100) * (maxOutput - minOutput) + minOutput;
+  if (mappedValue == -30) return -Infinity;
+
+  return mappedValue;
 }
