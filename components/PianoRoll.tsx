@@ -37,6 +37,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   const activeNotesRef = useRef<Set<string>>(new Set());
   const audioControllerRef = useRef<Tone.PanVol | null>(null);
 
+  const isPercussion = useRef(false);
   const [midiData, setMidiData] = useState<MidiNote[]>([]);
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -72,6 +73,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       // Extract note data
       const notes: MidiNote[] = [];
       tempo.current = midi.header.tempos[0]?.bpm || 120;
+      isPercussion.current = midi.tracks[0].instrument.percussion;
       midi.tracks.forEach((track) => {
         track.notes.forEach((note) => {
           notes.push({
@@ -171,9 +173,20 @@ const PianoRoll: React.FC<PianoRollProps> = ({
         vol,
       ).toDestination();
     }
-    const synth = new Tone.PolySynth(Tone.Synth).connect(
-      audioControllerRef.current,
-    );
+
+    // Initialize individual synths
+    const polySynth = new Tone.PolySynth().connect(audioControllerRef.current);
+
+    const kickSynth = new Tone.Player("/audio/kick-sample.mp3").toDestination();
+
+    const snareSynth = new Tone.Player(
+      "/audio/snare-sample.mp3",
+    ).toDestination();
+
+    const hihatSynth = new Tone.Player(
+      "/audio/hihat-sample.mp3",
+    ).toDestination();
+
     const transport = Tone.getTransport();
     const startTime = getScrollTime(progress, duration);
 
@@ -182,10 +195,41 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
     // Schedule each note
     midiData.forEach((note) => {
+      let synth: Tone.PolySynth | Tone.Player;
       let time = note.time - startTime;
+      if (time < 0) time = 0;
+
+      if (isPercussion.current) {
+        switch (note.note) {
+          case "B2": // Kick Drum
+          case "B3":
+            synth = kickSynth;
+            break;
+          case "D2": // Snare Drum
+            synth = snareSynth;
+            break;
+          case "F#2": // Closed Hi-Hat
+          case "C#3": // Open Hi-Hat
+            synth = hihatSynth;
+            break;
+          default:
+            synth = kickSynth; // Default to Kick if not matched
+        }
+      } else {
+        synth = polySynth;
+      }
+
       const duration = Math.max(note.duration, 0.01);
       transport.schedule((t) => {
-        synth.triggerAttackRelease(note.note, duration, t);
+        if (synth instanceof Tone.Player) {
+          synth.start(t);
+        } else {
+          // if (synth instanceof Tone.NoiseSynth) {
+          //   console.log("Noise Synth");
+          //   synth.triggerAttackRelease(note.note, duration, t);
+          // }
+          synth.triggerAttackRelease(note.note, duration, t);
+        }
       }, time);
     });
 
