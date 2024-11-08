@@ -21,7 +21,7 @@ export default function MidiEditor() {
   const audioControls = useRef<HTMLButtonElement>(null);
   const [midiOpen, setMidiOpen] = useState(false);
 
-  const [midiVolume, setMidiVolume] = useState(100);
+  const [midiVolume, setMidiVolume] = useState(50);
   const [midiPan, setMidiPan] = useState(0);
   const midiControls = {
     volume: midiVolume,
@@ -30,7 +30,7 @@ export default function MidiEditor() {
     setPan: setMidiPan,
   };
 
-  const [audioVolume, setAudioVolume] = useState(100);
+  const [audioVolume, setAudioVolume] = useState(50);
   const [audioPan, setAudioPan] = useState(0);
   const originalAudioControls = {
     volume: audioVolume,

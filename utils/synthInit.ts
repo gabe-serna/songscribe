@@ -4,9 +4,9 @@ export default function synthInit(
   audioControllerRef: React.MutableRefObject<Tone.PanVol>,
   name: string,
 ) {
-  const polySynth = new Tone.PolySynth(Tone.Synth)
-    .connect(audioControllerRef.current)
-    .toDestination();
+  const polySynth = new Tone.PolySynth(Tone.Synth).connect(
+    audioControllerRef.current,
+  );
 
   const guitarSample = new Tone.Sampler({
     urls: {
@@ -18,12 +18,12 @@ export default function synthInit(
       E4: "guitar-high-e-sample.mp3",
     },
     baseUrl: "/audio/guitar-samples/",
-  }).toDestination();
+  }).connect(audioControllerRef.current);
 
   const bassSample = new Tone.Sampler({
     urls: { Db3: "bass-sample.wav" },
     baseUrl: "/audio/",
-  }).toDestination();
+  }).connect(audioControllerRef.current);
 
   const pianoSample = new Tone.Sampler({
     urls: {
@@ -39,17 +39,27 @@ export default function synthInit(
       G6: "piano_G6.mp3",
     },
     baseUrl: "/audio/piano-samples/",
-  }).toDestination();
+  }).connect(audioControllerRef.current);
 
-  const kickSynth = new Tone.Player("/audio/kick-sample.mp3").toDestination();
+  const kickSynth = new Tone.Player("/audio/kick-sample.mp3").connect(
+    audioControllerRef.current,
+  );
 
-  const tomSynth = new Tone.Player("/audio/tom-sample.mp3").toDestination();
+  const tomSynth = new Tone.Player("/audio/tom-sample.mp3").connect(
+    audioControllerRef.current,
+  );
 
-  const snareSynth = new Tone.Player("/audio/snare-sample.mp3").toDestination();
+  const snareSynth = new Tone.Player("/audio/snare-sample.mp3").connect(
+    audioControllerRef.current,
+  );
 
-  const hihatSynth = new Tone.Player("/audio/hihat-sample.mp3").toDestination();
+  const hihatSynth = new Tone.Player("/audio/hihat-sample.mp3").connect(
+    audioControllerRef.current,
+  );
 
-  const crashSynth = new Tone.Player("/audio/crash-sample.wav").toDestination();
+  const crashSynth = new Tone.Player("/audio/crash-sample.wav").connect(
+    audioControllerRef.current,
+  );
 
   let defaultSynth: Tone.PolySynth | Tone.Sampler;
   switch (name) {
