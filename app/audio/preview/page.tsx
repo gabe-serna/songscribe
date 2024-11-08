@@ -1,7 +1,7 @@
 "use client";
 
 import PianoRoll from "@/components/PianoRoll";
-import { useWavesurfer } from "@wavesurfer/react";
+import WaveSurfer from "wavesurfer.js";
 import { useEffect, useRef, useState } from "react";
 
 export default function Preview() {
@@ -11,9 +11,13 @@ export default function Preview() {
   const ref = useRef<HTMLInputElement | null>(null);
   const lastRun = useRef(Date.now());
 
+  // Refs for Web Audio API nodes
   const audioCtxRef = useRef<AudioContext | null>(null);
   const panNodeRef = useRef<StereoPannerNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+
+  // Ref to store the WaveSurfer instance
+  const wavesurferRef = useRef<WaveSurfer | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -24,43 +28,64 @@ export default function Preview() {
   const audioPan = 100;
   const audioVol = 50;
 
-  const { wavesurfer, isReady } = useWavesurfer({
-    container: containerRef,
-    url: "/audio/rude_alpha_guitar.wav",
-    waveColor: "#44403c", //stone-700
-    progressColor: "#292524", //stone-800
-    height: 100,
-    barWidth: 5,
-    barHeight: 4,
-    barRadius: 5,
-    autoScroll: true,
-    autoCenter: true,
-    backend: "MediaElement",
-  });
+  // Function to initialize WaveSurfer and Web Audio API
+  const initializeWaveSurfer = () => {
+    if (wavesurferRef.current) return; // Prevent multiple initializations
 
-  // Set up the Web Audio API and connect pan node
-  useEffect(() => {
-    if (!wavesurfer || !isReady) return;
+    const wavesurfer = WaveSurfer.create({
+      container: containerRef.current as HTMLElement,
+      waveColor: "#44403c", // stone-700
+      progressColor: "#292524", // stone-800
+      height: 100,
+      barWidth: 5,
+      barHeight: 4,
+      barRadius: 5,
+      autoScroll: true,
+      autoCenter: true,
+      backend: "MediaElement",
+      normalize: true,
+      url: "/audio/rude_alpha_guitar.wav",
+    });
 
-    // Get the media element from wavesurfer
+    wavesurferRef.current = wavesurfer;
+
+    wavesurfer.on("ready", () => {
+      durationRef.current = wavesurfer.getDuration();
+      setProgress(0.1);
+    });
+
+    wavesurfer.on("timeupdate", () => {
+      const prog = getProgressPercent(progressRef);
+      setProgress(prog);
+    });
+
+    wavesurfer.on("finish", () => {
+      // Rate Limit Event Firing
+      if (Date.now() - lastRun.current < 1000) return;
+
+      lastRun.current = Date.now();
+      wavesurfer.stop();
+      setIsPlaying(false);
+      setProgress(0);
+    });
+
+    // Set up the Web Audio API and connect pan node
     const audioElement = wavesurfer.getMediaElement();
-    if (!audioElement) {
-      console.error("No media element available");
-      return;
-    }
-
-    // Create AudioContext if not already created
-    if (!audioCtxRef.current) {
+    if (audioElement) {
+      // Create AudioContext
       const audioCtx = new window.AudioContext();
       audioCtxRef.current = audioCtx;
 
+      // Create MediaElementAudioSourceNode
       const sourceNode = audioCtx.createMediaElementSource(audioElement);
       sourceNodeRef.current = sourceNode;
 
+      // Create StereoPannerNode
       const panNode = audioCtx.createStereoPanner();
-      panNode.pan.value = audioPan / 100;
+      panNode.pan.value = audioPan / 100; // Normalize pan value (-1 to 1)
       panNodeRef.current = panNode;
 
+      // Connect the nodes: source -> pan -> destination
       sourceNode.connect(panNode);
       panNode.connect(audioCtx.destination);
     }
@@ -72,12 +97,23 @@ export default function Preview() {
       }
     };
 
-    document.addEventListener("click", resumeAudioContext);
+    document.addEventListener("click", resumeAudioContext, { once: true });
+  };
 
-    return () => {
-      document.removeEventListener("click", resumeAudioContext);
-    };
-  }, [wavesurfer, isReady, audioPan]);
+  // Function to handle play/pause button click
+  const handlePlayPause = () => {
+    if (!wavesurferRef.current) {
+      initializeWaveSurfer();
+    }
+
+    if (isPlaying) {
+      wavesurferRef.current?.pause();
+      setIsPlaying(false);
+    } else {
+      wavesurferRef.current?.play();
+      setIsPlaying(true);
+    }
+  };
 
   // Update pan when audioPan changes
   useEffect(() => {
@@ -88,48 +124,20 @@ export default function Preview() {
 
   // Update volume when audioVol changes
   useEffect(() => {
-    if (wavesurfer) {
-      wavesurfer.setVolume(audioVol / 100);
+    if (wavesurferRef.current) {
+      wavesurferRef.current.setVolume(audioVol / 100);
     }
-  }, [audioVol, wavesurfer]);
-
-  wavesurfer?.on("timeupdate", () => {
-    const prog = getProgressPercent(progressRef) as number;
-    setProgress(prog);
-  });
-
-  wavesurfer?.on("finish", () => {
-    // Rate Limit Event Firing
-    if (Date.now() - lastRun.current < 1000) return;
-
-    lastRun.current = Date.now();
-    wavesurfer?.stop();
-    setIsPlaying(false);
-    setProgress(0);
-  });
+  }, [audioVol]);
 
   // Store Progress Bar Element
   useEffect(() => {
-    if (!isReady) return;
+    if (!wavesurferRef.current) return;
     const child = containerRef.current?.childNodes[0] as HTMLDivElement;
     const shadowRoot = child.shadowRoot;
     if (!shadowRoot) return;
     progressRef.current = shadowRoot.querySelector(".progress");
     setProgress(getProgressPercent(progressRef) as number);
-
-    // Ensure Midi and Audio have same duration
-    if (!wavesurfer) return;
-    durationRef.current = wavesurfer.getDuration();
-    setProgress(0.1);
-  }, [isReady, wavesurfer]);
-
-  useEffect(() => {
-    if (isPlaying) {
-      wavesurfer?.play();
-    } else {
-      wavesurfer?.pause();
-    }
-  }, [isPlaying, wavesurfer]);
+  }, [wavesurferRef.current]);
 
   // For testing purposes, load a MIDI file on page load
   useEffect(() => {
@@ -154,6 +162,12 @@ export default function Preview() {
   return (
     <div className="flex h-full w-[1000px] flex-col justify-center">
       <div>
+        <button
+          onClick={handlePlayPause}
+          className="mb-4 rounded bg-blue-500 px-4 py-2 text-white"
+        >
+          {isPlaying ? "Pause" : "Play"}
+        </button>
         <input
           ref={ref}
           type="file"
@@ -169,7 +183,7 @@ export default function Preview() {
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
             progress={progress}
-            duration={wavesurfer?.getDuration() as number}
+            duration={wavesurferRef.current?.getDuration() || 0}
             pan={midiPan}
             volume={midiVol}
           />

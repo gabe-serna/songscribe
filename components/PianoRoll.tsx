@@ -34,8 +34,10 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   const notesCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const pianoKeysContainerRef = useRef<HTMLDivElement | null>(null);
   const notesContainerRef = useRef<HTMLDivElement | null>(null);
-  const [midiData, setMidiData] = useState<MidiNote[]>([]);
   const activeNotesRef = useRef<Set<string>>(new Set());
+  const audioControllerRef = useRef<Tone.PanVol | null>(null);
+
+  const [midiData, setMidiData] = useState<MidiNote[]>([]);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const vol = getVolume(volume);
@@ -163,8 +165,15 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   // Play MIDI
   const playMidi = async () => {
     await Tone.start();
-    const panVol = new Tone.PanVol(panAmnt, vol).toDestination();
-    const synth = new Tone.PolySynth(Tone.Synth).connect(panVol);
+    if (!audioControllerRef.current) {
+      audioControllerRef.current = new Tone.PanVol(
+        panAmnt,
+        vol,
+      ).toDestination();
+    }
+    const synth = new Tone.PolySynth(Tone.Synth).connect(
+      audioControllerRef.current,
+    );
     const transport = Tone.getTransport();
     const startTime = getScrollTime(progress, duration);
 
@@ -190,8 +199,8 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     transport.stop();
     transport.cancel();
     setIsPlaying(false);
-    activeNotesRef.current = new Set(); // Clear active notes
-    drawPianoKeys(); // Redraw piano keys to reset colors
+    activeNotesRef.current = new Set();
+    drawPianoKeys();
   };
 
   useEffect(() => {
@@ -223,8 +232,6 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   useEffect(() => {
     // Determine the current time based on progress
     const currentTime = (progress / 100) * duration;
-
-    // Find all notes that are active at the currentTime
     const currentlyActiveNotes = new Set<string>();
 
     midiData.forEach((note) => {
@@ -239,10 +246,15 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     // Update the activeNotesRef only if there is a change
     if (!areSetsEqual(activeNotesRef.current, currentlyActiveNotes)) {
       activeNotesRef.current = currentlyActiveNotes;
-      // Redraw piano keys to reflect active notes
       drawPianoKeys(currentlyActiveNotes);
     }
   }, [progress, duration, midiData]);
+
+  useEffect(() => {
+    if (!audioControllerRef.current) return;
+    audioControllerRef.current.volume.value = vol;
+    audioControllerRef.current.pan.value = panAmnt;
+  }, [vol, panAmnt]);
 
   return (
     <div>

@@ -7,7 +7,7 @@ interface Props {
   setValue: (value: number) => void;
 }
 
-const StyledKnob = ({ value, setValue }: Props) => {
+const PanKnob = ({ value, setValue }: Props) => {
   const min = -100;
   const max = 100;
   const size = 40;
@@ -28,7 +28,11 @@ const StyledKnob = ({ value, setValue }: Props) => {
         snap={true}
         steps={10}
         value={value}
-        onChange={(val) => setValue(Math.round(val / 10) * 10)}
+        onChange={(val) => {
+          if (val == value) return;
+          if (Math.abs(value - val) > 50) return;
+          setTimeout(() => setValue(Math.round(val / 10) * 10), 10);
+        }}
       >
         {/* Background Arc */}
         <CustomArc
@@ -96,4 +100,4 @@ const StyledKnob = ({ value, setValue }: Props) => {
   );
 };
 
-export default StyledKnob;
+export default PanKnob;

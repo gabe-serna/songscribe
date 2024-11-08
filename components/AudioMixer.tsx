@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import StyledKnob from "@/components/StyledKnob";
+import PanKnob from "@/components/PanKnob";
 
 interface Props {
   name: string;
@@ -19,7 +19,7 @@ export default function AudioMixer({ name, controls }: Props) {
 
   return (
     <div className="flex h-full w-max flex-col-reverse items-center justify-center">
-      <StyledKnob value={pan} setValue={setPan} />
+      <PanKnob value={pan} setValue={setPan} />
       <Label htmlFor={htmlName} className="font-heading mt-4 font-bold">
         {name}
       </Label>
