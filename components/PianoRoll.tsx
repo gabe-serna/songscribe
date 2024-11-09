@@ -76,7 +76,11 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       // Extract note data
       const notes: MidiNote[] = [];
       tempo.current = midi.header.tempos[0]?.bpm || 120;
-      isPercussion.current = midi.tracks[0].instrument.percussion;
+
+      if (midi.tracks.length > 0) {
+        isPercussion.current = midi.tracks[0].instrument.percussion;
+      } else isPercussion.current = false;
+
       midi.tracks.forEach((track) => {
         track.notes.forEach((note) => {
           notes.push({

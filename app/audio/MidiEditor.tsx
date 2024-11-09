@@ -1,8 +1,17 @@
 "use client";
 
-import { MouseEventHandler, useContext, useRef, useState } from "react";
+import {
+  Dispatch,
+  FormEventHandler,
+  MouseEventHandler,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AudioContext } from "./AudioProvider";
-import { AudioStorage, Stem } from "@/utils/types";
+import { AudioStorage, midiAdjustments, Stem } from "@/utils/types";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import AudioMidiVisualizer from "@/components/AudioMidiVisualizer";
 import MidiAdjustments from "@/components/MidiAdjustments";
@@ -13,9 +22,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import AudioMixer from "@/components/AudioMixer";
+import { convertToMidi } from "@/utils/getMidi";
 
-export default function MidiEditor() {
-  const { audioStorage } = useContext(AudioContext);
+export default function MidiEditor({
+  conversionFlag,
+}: {
+  conversionFlag: Dispatch<SetStateAction<boolean>>;
+}) {
+  const { audioStorage, setAudioStorage, audioForm } = useContext(AudioContext);
   const [selectedMidi, setSelectedMidi] = useState<number>(0);
   const midiAdjustments = useRef<HTMLButtonElement>(null);
   const audioControls = useRef<HTMLButtonElement>(null);
@@ -38,15 +52,6 @@ export default function MidiEditor() {
     pan: audioPan,
     setPan: setAudioPan,
   };
-  // const [controlsOpen, setControlsOpen] = useState(false);
-
-  const handleOpen: MouseEventHandler<HTMLButtonElement> = (_event) => {
-    setTimeout(() => {
-      if (!midiAdjustments.current || !audioControls.current) return;
-      if (midiAdjustments.current.dataset.state === "open") setMidiOpen(true);
-      else setMidiOpen(false);
-    }, 50);
-  };
 
   const storageArray = Object.entries(
     audioStorage as Record<keyof AudioStorage, Stem>,
@@ -57,6 +62,66 @@ export default function MidiEditor() {
   const stem = (audioStorage as Record<keyof AudioStorage, Stem>)[
     key as keyof AudioStorage
   ];
+
+  const handleOpen: MouseEventHandler<HTMLButtonElement> = (_event) => {
+    setTimeout(() => {
+      if (!midiAdjustments.current || !audioControls.current) return;
+      if (midiAdjustments.current.dataset.state === "open") setMidiOpen(true);
+      else setMidiOpen(false);
+    }, 50);
+  };
+
+  const handleRegenerateMidi: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    conversionFlag(true);
+
+    setAudioStorage((prev) => {
+      if (!prev) return prev;
+      const updatedStorage: AudioStorage = { ...prev };
+      const name = stem.name;
+      updatedStorage[name] = {
+        ...updatedStorage[name],
+        midiBlob: null,
+      };
+
+      return updatedStorage;
+    });
+
+    const formData = new FormData(e.currentTarget);
+    const adjustments: midiAdjustments = {
+      onset_threshold: formData.get("note_segmentation") as string,
+      frame_threshold: formData.get("confidence_threshold") as string,
+      minimum_note_length: formData.get("minimum_note_length") as string,
+    };
+    const maxFreq = parseInt(formData.get("maximum_frequency") as string);
+    if (maxFreq < 18000) {
+      adjustments.maximum_frequency = maxFreq.toString();
+    }
+    const minFreq = parseInt(formData.get("minimum_frequency") as string);
+    if (minFreq > 0) {
+      adjustments.minimum_frequency = minFreq.toString();
+    }
+
+    const newMidi = await convertToMidi(
+      stem,
+      audioForm.tempo as number,
+      false,
+      adjustments,
+    );
+
+    setAudioStorage((prev) => {
+      if (!prev) return prev;
+      const updatedStorage: AudioStorage = { ...prev };
+      const name = stem.name;
+      updatedStorage[name] = {
+        ...updatedStorage[name],
+        midiBlob: newMidi,
+      };
+
+      return updatedStorage;
+    });
+    conversionFlag(false);
+  };
 
   return (
     <div className="flex w-min items-start justify-center space-x-12">
@@ -83,7 +148,7 @@ export default function MidiEditor() {
               Midi Adjustments
             </AccordionTrigger>
             <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-border bg-stone-200 px-6 dark:bg-popover">
-              <MidiAdjustments />
+              <MidiAdjustments handleSubmit={handleRegenerateMidi} />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="audio-controls">

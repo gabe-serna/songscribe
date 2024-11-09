@@ -1,18 +1,3 @@
-export type Tracks =
-  | "vocals"
-  | "no_vocals"
-  | "drums"
-  | "guitar"
-  | "bass"
-  | "piano"
-  | "others";
-
-export interface Stem {
-  name: Tracks;
-  audioBlob: Blob;
-  midiBlob: Blob | null;
-}
-
 export interface AudioStorage {
   vocals: Stem;
   no_vocals: Stem;
@@ -23,8 +8,6 @@ export interface AudioStorage {
   others: Stem;
 }
 
-export type SeparationMode = "Solo" | "Duet" | "Small Band" | "Full Band";
-
 export interface AudioFormData {
   audio_file?: File;
   audio_link?: string;
@@ -33,3 +16,28 @@ export interface AudioFormData {
   end_time?: number;
   tempo?: number;
 }
+
+export interface midiAdjustments {
+  onset_threshold: string;
+  frame_threshold: string;
+  minimum_note_length: string;
+  minimum_frequency?: string;
+  maximum_frequency?: string;
+}
+
+export interface Stem {
+  name: Tracks;
+  audioBlob: Blob;
+  midiBlob: Blob | null;
+}
+
+export type Tracks =
+  | "vocals"
+  | "no_vocals"
+  | "drums"
+  | "guitar"
+  | "bass"
+  | "piano"
+  | "others";
+
+export type SeparationMode = "Solo" | "Duet" | "Small Band" | "Full Band";

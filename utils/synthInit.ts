@@ -18,6 +18,9 @@ export default function synthInit(
       E4: "guitar-high-e-sample.mp3",
     },
     baseUrl: "/audio/guitar-samples/",
+    onload: () => {
+      guitarSample.releaseAll();
+    },
   }).connect(audioControllerRef.current);
 
   const bassSample = new Tone.Sampler({

@@ -3,7 +3,11 @@ import MidiSlider from "@/components/MidiSlider";
 import { Button } from "@/components/ui/button";
 import { FormEvent, useState } from "react";
 
-export default function MidiAdjustments() {
+export default function MidiAdjustments({
+  handleSubmit,
+}: {
+  handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
   const [reset, setReset] = useState(false);
   const handleReset = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -11,7 +15,11 @@ export default function MidiAdjustments() {
   };
 
   return (
-    <form className="flex flex-col gap-4" onReset={handleReset}>
+    <form
+      className="flex flex-col gap-4"
+      onReset={handleReset}
+      onSubmit={handleSubmit}
+    >
       <MidiSlider
         name="Minimum Note Length"
         defaultValue={130}
@@ -37,6 +45,7 @@ export default function MidiAdjustments() {
         resetSignal={reset}
       />
       <MidiSlider
+        // Onset Threshold
         name="Note Segmentation"
         defaultValue={0.5}
         max={0.95}
@@ -45,6 +54,7 @@ export default function MidiAdjustments() {
         resetSignal={reset}
       />
       <MidiSlider
+        // Frame Threshold
         name="Confidence Threshold"
         defaultValue={0.3}
         max={0.95}

@@ -10,11 +10,13 @@ export default function Page() {
   const { audioForm, audioStorage, setAudioStorage, songName } =
     useContext(AudioContext);
   const [flatScore, setFlatScore] = useState<string | null>(null);
+  const [isConverting, setIsConverting] = useState(false);
   const [isMidiComplete, setIsMidiComplete] = useState(false);
   const flatRef = useRef<HTMLDivElement>(null);
 
   // Convert to Midi
   useEffect(() => {
+    if (isConverting) return;
     handleMidiConversion(
       audioStorage,
       setAudioStorage,
@@ -62,7 +64,7 @@ export default function Page() {
   return (
     <div className="flex flex-col justify-around">
       {!audioStorage && <AudioForm />}
-      {audioStorage && <MidiEditor />}
+      {audioStorage && <MidiEditor conversionFlag={setIsConverting} />}
       {/* {isMidiComplete && (
         <MergeMidiButton
           tempo={audioForm.tempo as number}

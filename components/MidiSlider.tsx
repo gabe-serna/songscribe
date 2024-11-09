@@ -21,7 +21,7 @@ export default function MidiSlider({
   resetSignal,
 }: Props) {
   const [value, setValue] = useState(defaultValue);
-  const htmlName = name.toLowerCase().replace(" ", "_");
+  const htmlName = name.toLowerCase().replace(/\s/g, "_");
   const sliderRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
