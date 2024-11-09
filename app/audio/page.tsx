@@ -63,7 +63,7 @@ export default function Page() {
 
   return (
     <div
-      className="flex w-full max-w-[1200px] flex-col items-center justify-around max-xl:px-20"
+      className="flex w-full max-w-[1200px] flex-col items-center justify-around px-8 sm:px-20 xl:px-0"
       id="resize container"
     >
       {!audioStorage && <AudioForm />}

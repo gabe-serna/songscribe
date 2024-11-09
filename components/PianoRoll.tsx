@@ -1,10 +1,12 @@
 "use client";
 
-import synthInit from "@/utils/synthInit";
-import { useTheme } from "next-themes";
 import React, { useEffect, useRef, useState } from "react";
-import * as Tone from "tone";
+import synthInit from "@/utils/synthInit";
 import { Midi } from "tonejs-midi-fix";
+import * as Tone from "tone";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
+import { PauseCircle, PlayCircle } from "lucide-react";
 
 interface PianoRollProps {
   title: string;
@@ -52,11 +54,10 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
   // Constants
   const pianoKeyWidth = 50;
-  const containerWidth = 600 - pianoKeyWidth;
-  const noteHeight = 7;
+  const containerWidth = parentRef.current?.clientWidth || 800 - pianoKeyWidth;
+  const noteHeight = containerWidth > 600 ? 7 : containerWidth > 300 ? 6 : 5;
   const totalNotes = 88;
   const canvasHeight = totalNotes * noteHeight;
-  const containerHeight = 400;
 
   // Helper function to compare two sets
   const areSetsEqual = (a: Set<string>, b: Set<string>): boolean => {
@@ -155,11 +156,12 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
     const height = canvas.height;
     const secondsPerBeat = 60 / tempo.current;
-    const eightMeasures = 8 * 4 * secondsPerBeat;
-    const timeScale = 950 / eightMeasures; // Pixels Per Second
-    canvas.width = duration * timeScale + 950;
+    const measures = containerWidth > 600 ? 8 : containerWidth > 300 ? 6 : 4;
+    const viewLength = measures * 4 * secondsPerBeat;
+    const timeScale = containerWidth / viewLength; // Pixels Per Second
+    canvas.width = duration * timeScale + containerWidth - pianoKeyWidth;
 
-    ctx.clearRect(0, 0, 950, height);
+    ctx.clearRect(0, 0, containerWidth, height);
 
     // Draw each note as a rectangle
     notes.forEach((note) => {
@@ -319,17 +321,11 @@ const PianoRoll: React.FC<PianoRollProps> = ({
         ref={parentRef}
         className="relative flex h-[300px] rounded-2xl bg-accent shadow-lg dark:shadow-stone-900 xl:h-[400px]"
       >
-        <div
-          className="piano-roll-container flex w-full overflow-hidden rounded-2xl"
-          style={{ position: "relative" }}
-        >
+        <div className="piano-roll-container relative flex w-full overflow-hidden rounded-2xl">
           {/* Piano Keys Container */}
           <div
             ref={pianoKeysContainerRef}
-            className="piano-keys-container no-scrollbar h-full overflow-hidden"
-            style={{
-              width: pianoKeyWidth,
-            }}
+            className="piano-keys-container no-scrollbar overflow-y-hidden"
           >
             <canvas
               ref={pianoKeysCanvasRef}
@@ -354,9 +350,12 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       </div>
 
       <div className="mt-[10px]">
-        <button onClick={isPlaying ? stopMidi : playMidi}>
-          {isPlaying ? "Stop" : "Play"}
-        </button>
+        <Button
+          onClick={isPlaying ? stopMidi : playMidi}
+          className="button-primary h-auto translate-y-4 rounded-xl bg-accent px-6 py-1 leading-none shadow-md *:size-6 *:stroke-yellow-500 dark:shadow-stone-900 *:dark:stroke-yellow-700"
+        >
+          {isPlaying ? <PauseCircle /> : <PlayCircle />}
+        </Button>
       </div>
     </>
   );

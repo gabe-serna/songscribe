@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect, PointerEventHandler } from "react";
 import { Knob, Pointer } from "rc-knob";
 import { CustomArc } from "./CustomArc";
 
@@ -12,13 +12,104 @@ const PanKnob = ({ value, setValue }: Props) => {
   const max = 100;
   const size = 40;
   const arcWidth = size * 0.15;
-  const pointerSize = size * 0.08;
-
   const arcRadius = size / 2 - arcWidth / 2;
+  const pointerSize = size * 0.08;
   const pointerRadius = arcRadius - pointerSize;
 
+  const knobRef = useRef<HTMLDivElement>(null);
+  const currentVal = useRef(value);
+  const [isDragging, setIsDragging] = useState(false);
+  const totalAngle = useRef(0);
+  const lastAngle = useRef(0);
+  const [startValue, setStartValue] = useState(value);
+
+  // Function to handle pointer down
+  const handlePointerDown: PointerEventHandler<HTMLDivElement> = (e) => {
+    if (!knobRef.current) return;
+
+    const rect = knobRef.current.getBoundingClientRect();
+    const center = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    };
+
+    const angle = Math.atan2(e.clientY - center.y, e.clientX - center.x);
+
+    lastAngle.current = angle;
+    totalAngle.current = 0;
+    setStartValue(value);
+    setIsDragging(true);
+    e.preventDefault();
+  };
+
+  // Function to handle pointer move and calculate value
+  const handlePointerMove = (e: PointerEvent) => {
+    if (!isDragging || !knobRef.current) return;
+
+    const rect = knobRef.current.getBoundingClientRect();
+    const center = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    };
+
+    const angle = Math.atan2(e.clientY - center.y, e.clientX - center.x);
+    let deltaAngle = angle - lastAngle.current;
+
+    // Adjust for angle wrapping
+    if (deltaAngle > Math.PI) {
+      deltaAngle -= 2 * Math.PI;
+    } else if (deltaAngle < -Math.PI) {
+      deltaAngle += 2 * Math.PI;
+    }
+
+    totalAngle.current += deltaAngle;
+    lastAngle.current = angle;
+
+    // Map totalAngle to value
+    const totalAngleRangeRadians = (280 * Math.PI) / 180; // 280 degrees in radians
+    const valueRange = max - min; // 200
+    let newValue =
+      startValue + (totalAngle.current / totalAngleRangeRadians) * valueRange;
+
+    let finalValue = Math.round(newValue / 10) * 10;
+
+    // Format Final Value
+    if (finalValue < min) finalValue = min;
+    else if (finalValue > max) finalValue = max;
+    if (Math.abs(currentVal.current - finalValue) > 50) return;
+
+    setValue(finalValue);
+  };
+
+  // Function to handle pointer up
+  const handlePointerUp = () => setIsDragging(false);
+
+  // Manage adding and removing pointer event listeners
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointerup", handlePointerUp);
+    } else {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    }
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [isDragging]);
+
+  useEffect(() => {
+    if (value === currentVal.current) return;
+    currentVal.current = value;
+  }, [value]);
+
   return (
-    <div className="mt-3 flex flex-col items-center">
+    <div
+      ref={knobRef}
+      onPointerDown={handlePointerDown}
+      className="mt-3 flex touch-none flex-col items-center"
+    >
       <Knob
         size={size}
         angleOffset={-140}
@@ -29,7 +120,6 @@ const PanKnob = ({ value, setValue }: Props) => {
         steps={10}
         value={value}
         onChange={(val) => {
-          if (val == value) return;
           if (Math.abs(value - val) > 50) return;
           setTimeout(() => setValue(Math.round(val / 10) * 10), 10);
         }}
@@ -88,7 +178,9 @@ const PanKnob = ({ value, setValue }: Props) => {
           L
         </span>
         <p
-          className={`mt-1 w-12 text-center text-card-foreground ${value < 0 ? "-translate-x-[0.1875rem]" : ""}`}
+          className={`mt-1 w-12 text-center text-card-foreground ${
+            value < 0 ? "-translate-x-[0.1875rem]" : ""
+          }`}
         >
           {value.toFixed(0)}
         </p>
