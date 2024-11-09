@@ -52,7 +52,7 @@ export default function AudioPart2() {
       </TransitionGroup>
       <Button
         type="submit"
-        className={`mt-4 w-full rounded-full bg-accent text-base font-semibold text-foreground shadow-lg hover:bg-accent dark:shadow-stone-900 lg:w-3/4 ${selectedMode ? "transition-visible" : "transition-invisible"}`}
+        className={`mt-4 w-full rounded-full bg-accent text-base font-semibold text-foreground shadow-lg hover:bg-accent dark:shadow-stone-900 max-lg:text-lg sm:max-lg:py-6 lg:w-3/4 ${selectedMode ? "transition-visible" : "transition-invisible"}`}
       >
         Next
       </Button>

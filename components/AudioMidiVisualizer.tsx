@@ -210,10 +210,7 @@ export default function AudioMidiVisualizer({
             pan={midiPan}
           />
         ) : (
-          <Skeleton
-            className="mb-9 flex items-center justify-center rounded-2xl bg-accent text-card-foreground shadow-lg dark:shadow-stone-900"
-            style={{ height: 400 }}
-          >
+          <Skeleton className="mb-9 flex h-[300px] items-center justify-center rounded-2xl bg-accent text-card-foreground shadow-lg dark:shadow-stone-900 xl:h-[400px]">
             Generating Midi...
           </Skeleton>
         )}

@@ -101,7 +101,7 @@ export default function AudioForm() {
           ref={part1Ref}
           className="flex flex-col items-center justify-center space-y-16"
         >
-          <h1 className="w-[15ch] text-center text-3xl font-bold lg:w-auto lg:text-4xl">
+          <h1 className="w-[15ch] text-center text-3xl font-bold md:w-auto md:text-4xl">
             The fastest way to turn any song into sheet music
           </h1>
           <AudioPart1 />
@@ -120,7 +120,7 @@ export default function AudioForm() {
           ref={part2Ref}
           className="flex flex-col items-center justify-center space-y-4"
         >
-          <h1 className="text-center text-3xl font-bold lg:text-4xl">
+          <h1 className="text-center text-3xl font-bold md:text-4xl">
             Choose Isolation Mode
           </h1>
           <AudioPart2 />
