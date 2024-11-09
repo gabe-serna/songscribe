@@ -27,6 +27,7 @@ export default function AudioMidiVisualizer({
   controls,
 }: Props) {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const parentRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const lastRun = useRef(Date.now());
   const { volume: midiVol, pan: midiPan } = controls[0];
@@ -191,7 +192,10 @@ export default function AudioMidiVisualizer({
   }, [isPlaying]);
 
   return (
-    <div className="flex h-full w-[1000px] flex-col justify-center">
+    <div
+      ref={parentRef}
+      className="flex h-full w-full max-w-[800px] flex-col justify-center"
+    >
       <h1 className="text-2xl font-bold">{title}</h1>
       <div className="mt-4">
         {duration !== null && midiFile ? (
@@ -214,7 +218,7 @@ export default function AudioMidiVisualizer({
           </Skeleton>
         )}
       </div>
-      <div className="mb-8 rounded-2xl bg-accent p-4 shadow-lg">
+      <div className="mb-8 w-full rounded-2xl bg-accent p-4 shadow-lg">
         <div
           className={isPlaying ? "pointer-events-none" : "cursor-col-resize"}
           ref={containerRef}

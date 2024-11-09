@@ -62,7 +62,10 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="flex flex-col justify-around">
+    <div
+      className="flex w-full max-w-[1200px] flex-col items-center justify-around max-xl:px-20"
+      id="resize container"
+    >
       {!audioStorage && <AudioForm />}
       {audioStorage && <MidiEditor conversionFlag={setIsConverting} />}
       {/* {isMidiComplete && (

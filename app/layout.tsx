@@ -45,7 +45,10 @@ export default function RootLayout({
           <main className="flex min-h-screen flex-col items-center">
             <div className="flex w-full flex-1 flex-col items-center">
               {/* <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10"></nav> */}
-              <div className="flex h-screen max-w-5xl flex-col items-center justify-center gap-20 p-5">
+              <div
+                id="main-content-container"
+                className="flex h-screen w-full flex-col items-center justify-center gap-20 p-5"
+              >
                 {children}
               </div>
 

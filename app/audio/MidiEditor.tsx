@@ -57,6 +57,7 @@ export default function MidiEditor({
     audioStorage as Record<keyof AudioStorage, Stem>,
   );
   const key = storageArray[selectedMidi][0];
+  const isDrums = key === "drums";
   const isLastKey = selectedMidi === storageArray.length - 1;
   const isFirstKey = selectedMidi === 0;
   const stem = (audioStorage as Record<keyof AudioStorage, Stem>)[
@@ -124,7 +125,8 @@ export default function MidiEditor({
   };
 
   return (
-    <div className="flex w-min items-start justify-center space-x-12">
+    <div className="flex w-full flex-col items-start justify-center max-xl:max-w-[800px] xl:flex-row xl:space-x-12">
+      {/* ^ div should have xl:max-w-1200px */}
       <AudioMidiVisualizer
         name={stem.name}
         audioBlob={stem.audioBlob}
@@ -133,29 +135,32 @@ export default function MidiEditor({
       />
       <Accordion
         type="single"
-        className="flex h-[565.6px] flex-col justify-between"
+        orientation="horizontal"
+        className="flex w-full flex-col justify-between max-xl:ml-0 max-xl:mt-8 xl:h-[565.6px] xl:max-w-[300px]"
         collapsible
       >
         <div
-          className={`flex flex-col justify-between space-y-4 ${midiOpen ? "h-[565.6px]" : ""}`}
+          className={`flex flex-col space-y-4 xl:justify-between ${midiOpen ? "justify-between xl:h-[565.6px]" : "justify-normal"}`}
         >
-          <AccordionItem value="midi-adjustments">
-            <AccordionTrigger
-              ref={midiAdjustments}
-              onClick={handleOpen}
-              className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6 data-[state=open]:rounded-b-none"
-            >
-              Midi Adjustments
-            </AccordionTrigger>
-            <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-border bg-stone-200 px-6 dark:bg-popover">
-              <MidiAdjustments handleSubmit={handleRegenerateMidi} />
-            </AccordionContent>
-          </AccordionItem>
+          {!isDrums && (
+            <AccordionItem value="midi-adjustments">
+              <AccordionTrigger
+                ref={midiAdjustments}
+                onClick={handleOpen}
+                className="font-heading w-full rounded-3xl border-2 border-border bg-accent px-6 data-[state=open]:rounded-b-none"
+              >
+                Midi Adjustments
+              </AccordionTrigger>
+              <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-border bg-stone-200 px-6 dark:bg-popover">
+                <MidiAdjustments handleSubmit={handleRegenerateMidi} />
+              </AccordionContent>
+            </AccordionItem>
+          )}
           <AccordionItem value="audio-controls">
             <AccordionTrigger
               ref={audioControls}
               onClick={handleOpen}
-              className="font-heading w-[300px] rounded-3xl border-2 border-border bg-accent px-6 data-[state=open]:rounded-b-none"
+              className="font-heading w-max rounded-3xl border-2 border-border bg-accent px-6 data-[state=open]:rounded-b-none xl:max-w-[300px]"
             >
               Audio Controls
             </AccordionTrigger>
@@ -166,12 +171,12 @@ export default function MidiEditor({
           </AccordionItem>
         </div>
         {!midiOpen && (
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-row max-xl:mt-4 max-xl:items-center max-xl:justify-center max-xl:space-x-8 xl:flex-col xl:space-y-4">
             {!isFirstKey && (
               <AccordionItem
-                value="next"
+                value="back"
                 onClick={() => setSelectedMidi(selectedMidi - 1)}
-                className="button-secondary flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base font-semibold transition-colors"
+                className="button-secondary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base font-semibold transition-colors xl:max-w-[300px]"
               >
                 Back <ArrowLeft className="size-4" />
               </AccordionItem>
@@ -180,14 +185,14 @@ export default function MidiEditor({
               <AccordionItem
                 value="next"
                 onClick={() => setSelectedMidi(selectedMidi + 1)}
-                className="button-primary flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base font-semibold transition-colors"
+                className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base font-semibold transition-colors xl:max-w-[300px]"
               >
                 Next <ArrowRight className="size-4" />
               </AccordionItem>
             ) : (
               <AccordionItem
-                value="next"
-                className="mt-4 flex w-[300px] cursor-pointer items-center justify-center gap-2 rounded-3xl bg-yellow-400 px-6 py-2 text-base font-semibold text-foreground dark:bg-yellow-600 dark:text-background"
+                value="export"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-3xl bg-yellow-400 px-6 py-2 text-base font-semibold text-foreground dark:bg-yellow-600 dark:text-background xl:max-w-[300px]"
               >
                 Export
               </AccordionItem>

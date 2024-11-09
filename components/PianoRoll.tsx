@@ -33,6 +33,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   volume,
   pan,
 }) => {
+  const parentRef = useRef<HTMLDivElement | null>(null);
   const pianoKeysCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const notesCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const pianoKeysContainerRef = useRef<HTMLDivElement | null>(null);
@@ -51,10 +52,10 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
   // Constants
   const pianoKeyWidth = 50;
+  const containerWidth = 600 - pianoKeyWidth;
   const noteHeight = 7;
   const totalNotes = 88;
   const canvasHeight = totalNotes * noteHeight;
-  const containerWidth = 950;
   const containerHeight = 400;
 
   // Helper function to compare two sets
@@ -313,22 +314,21 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   }, [vol, panAmnt]);
 
   return (
-    <div>
+    <>
       <div
-        className="relative flex rounded-2xl bg-accent shadow-lg dark:shadow-stone-900"
-        style={{ height: containerHeight }}
+        ref={parentRef}
+        className="relative flex h-[300px] rounded-2xl bg-accent shadow-lg dark:shadow-stone-900 xl:h-[400px]"
       >
         <div
-          className="piano-roll-container flex overflow-hidden rounded-2xl"
+          className="piano-roll-container flex w-full overflow-hidden rounded-2xl"
           style={{ position: "relative" }}
         >
           {/* Piano Keys Container */}
           <div
             ref={pianoKeysContainerRef}
-            className="piano-keys-container no-scrollbar overflow-hidden"
+            className="piano-keys-container no-scrollbar h-full overflow-hidden"
             style={{
               width: pianoKeyWidth,
-              height: containerHeight,
             }}
           >
             <canvas
@@ -341,11 +341,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
           {/* Notes Container */}
           <div
             ref={notesContainerRef}
-            className="overflow-x-hidden overflow-y-scroll"
-            style={{
-              width: containerWidth,
-              height: containerHeight,
-            }}
+            className="h-full w-full overflow-x-hidden overflow-y-scroll"
             onScroll={syncScroll}
           >
             <canvas
@@ -362,7 +358,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
           {isPlaying ? "Stop" : "Play"}
         </button>
       </div>
-    </div>
+    </>
   );
 };
 

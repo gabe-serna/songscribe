@@ -16,7 +16,7 @@ export default function MidiAdjustments({
 
   return (
     <form
-      className="flex flex-col gap-4"
+      className="grid grid-cols-2 gap-4 gap-x-8 xl:grid-cols-1"
       onReset={handleReset}
       onSubmit={handleSubmit}
     >
@@ -65,7 +65,7 @@ export default function MidiAdjustments({
       <Button
         size="sm"
         type="reset"
-        className="button-secondary rounded-3xl border-2 border-border font-semibold"
+        className="button-secondary rounded-3xl border-2 border-border font-semibold max-xl:col-start-1"
       >
         Reset
       </Button>

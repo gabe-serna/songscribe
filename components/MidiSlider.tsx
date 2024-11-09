@@ -10,6 +10,7 @@ interface Props {
   min: number;
   step: number;
   resetSignal: boolean;
+  className?: string;
 }
 
 export default function MidiSlider({
@@ -19,6 +20,7 @@ export default function MidiSlider({
   min,
   step,
   resetSignal,
+  className,
 }: Props) {
   const [value, setValue] = useState(defaultValue);
   const htmlName = name.toLowerCase().replace(/\s/g, "_");
@@ -29,7 +31,7 @@ export default function MidiSlider({
   }, [resetSignal]);
 
   return (
-    <span>
+    <span className={className}>
       <Label htmlFor={htmlName}>{name}</Label>
       <div className="flex h-max items-center justify-center gap-4 *:mt-1">
         <Slider

@@ -179,6 +179,7 @@ export default function Preview() {
         />
         {midiFile && progressRef.current && (
           <PianoRoll
+            title="MIDI Preview"
             midiFile={midiFile}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
