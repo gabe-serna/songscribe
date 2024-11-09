@@ -40,7 +40,7 @@ export default function Loading({ text = "Loading", dotCount = 3 }: Props) {
   useEffect(() => {
     const interval = setInterval(() => {
       setInfoTrigger((prev) => !prev);
-    }, 12000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, [infoTrigger]);
@@ -49,7 +49,9 @@ export default function Loading({ text = "Loading", dotCount = 3 }: Props) {
     <>
       <div className="relative flex items-center text-center text-3xl font-bold transition-all lg:text-4xl">
         <span>{text}</span>
-        <span className="absolute ml-2 flex translate-x-36">{dots}</span>
+        <span className="absolute ml-2 flex translate-x-28 lg:translate-x-36">
+          {dots}
+        </span>
       </div>
       <CSSTransition
         nodeRef={infoRef}

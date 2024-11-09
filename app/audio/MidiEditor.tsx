@@ -7,35 +7,48 @@ import {
   MouseEventHandler,
   SetStateAction,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
 import { AudioContext } from "./AudioProvider";
+import { useToast } from "@/hooks/use-toast";
+import { createScore } from "@/utils/flat";
+import { convertToMidi } from "@/utils/getMidi";
+import mergeMidi from "@/utils/mergeMidi";
 import { AudioStorage, midiAdjustments, Stem } from "@/utils/types";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import AudioMidiVisualizer from "@/components/AudioMidiVisualizer";
 import MidiAdjustments from "@/components/MidiAdjustments";
+import AudioMixer from "@/components/AudioMixer";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import AudioMixer from "@/components/AudioMixer";
-import { convertToMidi } from "@/utils/getMidi";
 
 interface Props {
   conversionFlag: Dispatch<SetStateAction<boolean>>;
+  isMidiComplete: boolean;
+  setFlatScore: Dispatch<SetStateAction<string | null>>;
 }
 
 const MidiEditor = forwardRef(
-  ({ conversionFlag }: Props, ref: React.ForwardedRef<HTMLDivElement>) => {
-    const { audioStorage, setAudioStorage, audioForm } =
+  (
+    { conversionFlag, isMidiComplete, setFlatScore }: Props,
+    ref: React.ForwardedRef<HTMLDivElement>,
+  ) => {
+    const { audioStorage, setAudioStorage, audioForm, songName } =
       useContext(AudioContext);
     const [selectedMidi, setSelectedMidi] = useState<number>(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [midiOpen, setMidiOpen] = useState(false);
+    const { toast } = useToast();
+
     const midiAdjustments = useRef<HTMLButtonElement>(null);
     const audioControls = useRef<HTMLButtonElement>(null);
-    const [midiOpen, setMidiOpen] = useState(false);
+    const message = useRef<string | null>(null);
 
     const [midiVolume, setMidiVolume] = useState(50);
     const [midiPan, setMidiPan] = useState(0);
@@ -128,6 +141,66 @@ const MidiEditor = forwardRef(
       conversionFlag(false);
     };
 
+    const startMerge = async () => {
+      setIsSubmitting(true);
+      message.current = null;
+      if (!audioStorage) {
+        message.current = "No audio tracks to merge.";
+        setIsSubmitting(false);
+        return;
+      }
+
+      try {
+        const names = Object.keys(audioStorage);
+        console.log("names", names);
+
+        const midiFiles = await Promise.all(
+          Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
+            async ([_, stem]) => {
+              const stemMidi = stem.midiBlob as Blob;
+              return (await stemMidi.arrayBuffer()) as ArrayBuffer;
+            },
+          ),
+        );
+
+        const songMidi = await mergeMidi(
+          midiFiles,
+          audioForm.tempo as number,
+          names,
+          songName.current,
+        );
+        const blob = new Blob([songMidi], { type: "application/octet-stream" });
+        console.log("creating flat score...");
+        const response = await createScore(blob, songName.current);
+        console.log("flat.io response: ", response);
+        setFlatScore(response.id);
+        console.log("flat score: ", response.id);
+
+        // **For Testing: Download the merged MIDI file**
+        // const url = URL.createObjectURL(blob);
+        // const a = document.createElement("a");
+        // a.href = url;
+        // a.download = "TranscribedSong.mid";
+        // a.click();
+        // URL.revokeObjectURL(url);
+      } catch (error) {
+        message.current = "Failed to merge midi files.";
+        console.error(error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+    useEffect(() => {
+      if (message.current) {
+        toast({
+          variant: "destructive",
+          title: "Whoops! Error Creating Score",
+          description: message.current,
+        });
+      }
+    }, [message.current]);
+
     return (
       <div
         ref={ref}
@@ -149,7 +222,10 @@ const MidiEditor = forwardRef(
             className={`flex flex-col space-y-4 xl:justify-between ${midiOpen ? "justify-between xl:h-[565.6px]" : "justify-normal"}`}
           >
             {!isDrums && (
-              <AccordionItem value="midi-adjustments">
+              <AccordionItem
+                value="midi-adjustments"
+                className="rounded-3xl shadow-md"
+              >
                 <AccordionTrigger
                   ref={midiAdjustments}
                   onClick={handleOpen}
@@ -162,7 +238,10 @@ const MidiEditor = forwardRef(
                 </AccordionContent>
               </AccordionItem>
             )}
-            <AccordionItem value="audio-controls">
+            <AccordionItem
+              value="audio-controls"
+              className="rounded-3xl shadow-md"
+            >
               <AccordionTrigger
                 ref={audioControls}
                 onClick={handleOpen}
@@ -182,7 +261,7 @@ const MidiEditor = forwardRef(
                 <AccordionItem
                   value="back"
                   onClick={() => setSelectedMidi(selectedMidi - 1)}
-                  className="button-secondary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base transition-colors xl:max-w-[300px]"
+                  className="button-secondary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base shadow-md transition-colors xl:max-w-[300px]"
                 >
                   Back <ArrowLeft className="size-4" />
                 </AccordionItem>
@@ -191,16 +270,21 @@ const MidiEditor = forwardRef(
                 <AccordionItem
                   value="next"
                   onClick={() => setSelectedMidi(selectedMidi + 1)}
-                  className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base transition-colors xl:max-w-[300px]"
+                  className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-lg transition-colors xl:max-w-[300px]"
                 >
                   Next <ArrowRight className="size-4" />
                 </AccordionItem>
               ) : (
                 <AccordionItem
                   value="export"
-                  className="button-action flex w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base xl:max-w-[300px]"
+                  aria-disabled={!isMidiComplete}
+                  onClick={() => {
+                    if (!isMidiComplete) return;
+                    startMerge();
+                  }}
+                  className={`flex w-full items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-lg transition-colors xl:max-w-[300px] ${isMidiComplete ? "button-action cursor-pointer" : "button-action-disabled cursor-default"}`}
                 >
-                  Export
+                  {!isSubmitting ? "Export" : "Exporting..."}
                 </AccordionItem>
               )}
             </div>

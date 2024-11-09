@@ -14,12 +14,16 @@ export default function Page() {
   const [formComplete, setFormComplete] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
   const [isMidiComplete, setIsMidiComplete] = useState(false);
+  const [isEditingComplete, setIsEditingComplete] = useState(false);
   const flatRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
   // Convert to Midi
   useEffect(() => {
-    if (isConverting) return;
+    if (isConverting) {
+      setIsMidiComplete(false);
+      return;
+    }
     handleMidiConversion(
       audioStorage,
       setAudioStorage,
@@ -34,6 +38,8 @@ export default function Page() {
   // Create Flat Score
   useEffect(() => {
     const container = flatRef.current;
+    console.log("flatScore has been updated:", flatScore);
+    console.log("container:", container);
     if (!container || !flatScore) return;
     console.log("Creating Flat.io embed");
     import("flat-embed")
@@ -49,7 +55,8 @@ export default function Page() {
       .catch((error) => {
         console.error("Failed to load flat-embed:", error);
       });
-  }, [flatScore]);
+  }, [flatScore, isEditingComplete]);
+  console.log("flatRef:", flatRef);
 
   // Warn user before leaving the page
   useEffect(() => {
@@ -72,22 +79,31 @@ export default function Page() {
       {!formComplete && <AudioForm setFormComplete={setFormComplete} />}
       <CSSTransition
         nodeRef={editorRef}
-        in={formComplete}
+        in={formComplete && !flatScore}
+        timeout={700}
+        classNames="fade"
+        onExited={() => setIsEditingComplete(true)}
+        unmountOnExit
+      >
+        <MidiEditor
+          ref={editorRef}
+          conversionFlag={setIsConverting}
+          isMidiComplete={isMidiComplete}
+          setFlatScore={setFlatScore}
+        />
+      </CSSTransition>
+      <CSSTransition
+        nodeRef={flatRef}
+        in={isEditingComplete}
         timeout={700}
         classNames="fade"
         unmountOnExit
       >
-        <MidiEditor ref={editorRef} conversionFlag={setIsConverting} />
-      </CSSTransition>
-      {/* {isMidiComplete && (
-        <MergeMidiButton
-          tempo={audioForm.tempo as number}
-          audioStorage={audioStorage}
-          songName={songName.current}
-          setFlatScore={setFlatScore}
+        <div
+          ref={flatRef}
+          className="h-[75vh] w-full overflow-hidden rounded-3xl shadow-lg dark:shadow-stone-900"
         />
-      )} */}
-      {flatScore && <div ref={flatRef} className="h-[75vh] w-full" />}
+      </CSSTransition>
     </div>
   );
 }
