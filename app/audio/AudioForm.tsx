@@ -9,8 +9,13 @@ import getTempo from "@/utils/getTempo";
 import isolateAudio from "@/utils/isolateAudio";
 import getAudioFromURL from "@/utils/getAudioFromUrl";
 import { useToast } from "@/hooks/use-toast";
+import Loading from "@/components/Loading";
 
-export default function AudioForm() {
+export default function AudioForm({
+  setFormComplete,
+}: {
+  setFormComplete: (value: boolean) => void;
+}) {
   const { audioForm, setAudioForm, setAudioStorage, songName } =
     useContext(AudioContext);
   const isPart1Complete = audioForm.audio_file || audioForm.audio_link;
@@ -72,7 +77,10 @@ export default function AudioForm() {
 
         // Make API Request
         isolateAudio(formData, setAudioStorage).then(() => {
-          setIsSubmitting(false);
+          setTimeout(() => {
+            setIsSubmitting(false);
+            setisLoading(false);
+          }, 2000);
         });
       } catch (error) {
         console.error(error);
@@ -151,16 +159,14 @@ export default function AudioForm() {
         in={isLoading}
         timeout={700}
         classNames="fade"
+        onExited={() => setFormComplete(true)}
         unmountOnExit
       >
         <div
           ref={loadingRef}
           className="flex flex-col items-center justify-center space-y-4"
         >
-          <h1 className="text-center text-3xl font-bold lg:text-4xl">
-            Loading...
-          </h1>
-          {/* <LoadingFacts/> */}
+          <Loading />
         </div>
       </CSSTransition>
     </div>

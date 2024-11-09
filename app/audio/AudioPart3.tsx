@@ -132,7 +132,7 @@ export default function AudioPart3({
         </div>
         <Button
           type="submit"
-          className="mt-4 w-full rounded-full bg-yellow-400 text-base font-semibold text-foreground shadow-lg hover:bg-yellow-400 dark:bg-yellow-600 dark:text-background dark:shadow-stone-900 dark:hover:bg-yellow-600 max-lg:text-lg sm:max-lg:py-6 lg:w-3/4"
+          className="button-action mt-4 w-full rounded-full text-base shadow-lg max-lg:text-lg sm:max-lg:py-6 lg:w-3/4"
         >
           Submit
         </Button>

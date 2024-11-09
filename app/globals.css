@@ -113,10 +113,13 @@ a,
 }
 
 .button-primary {
-  @apply bg-stone-600 text-background hover:bg-stone-700 dark:bg-stone-300 dark:hover:bg-stone-50;
+  @apply bg-stone-600 font-semibold text-background hover:bg-stone-700 dark:bg-stone-300 dark:hover:bg-stone-50;
 }
 .button-secondary {
-  @apply bg-accent text-foreground hover:bg-stone-100 dark:hover:bg-stone-800;
+  @apply bg-accent font-semibold text-foreground hover:bg-stone-100 dark:hover:bg-stone-800;
+}
+.button-action {
+  @apply bg-yellow-400 font-semibold text-foreground hover:bg-[#ffd52e] dark:bg-yellow-600 dark:text-background dark:shadow-stone-900 dark:hover:bg-yellow-500;
 }
 
 @layer utilities {
@@ -148,6 +151,27 @@ a,
     opacity ease,
     visibility 0.3s ease,
     background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.loading-dot {
+  opacity: 0;
+  animation: blink 1.5s infinite;
+  margin-right: 4px;
+}
+
+.loading-dot:last-child {
+  margin-right: 0;
 }
 
 ::-webkit-scrollbar {

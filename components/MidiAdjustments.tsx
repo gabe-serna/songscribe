@@ -1,6 +1,7 @@
 "use client";
 import MidiSlider from "@/components/MidiSlider";
 import { Button } from "@/components/ui/button";
+import { useScreenSize } from "@/hooks/use-screen-size";
 import { FormEvent, useState } from "react";
 
 export default function MidiAdjustments({
@@ -9,6 +10,7 @@ export default function MidiAdjustments({
   handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   const [reset, setReset] = useState(false);
+  const screenSize = useScreenSize();
   const handleReset = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setReset((prev) => !prev);
@@ -70,7 +72,7 @@ export default function MidiAdjustments({
         Reset
       </Button>
       <Button size="sm" className="button-primary rounded-3xl font-semibold">
-        Regenerate Midi
+        Regenerate {screenSize != "xs" ? "Midi" : ""}
       </Button>
     </form>
   );
