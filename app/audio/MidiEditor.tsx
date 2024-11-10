@@ -172,9 +172,7 @@ const MidiEditor = forwardRef(
         const blob = new Blob([songMidi], { type: "application/octet-stream" });
         console.log("creating flat score...");
         const response = await createScore(blob, songName.current);
-        console.log("flat.io response: ", response);
         setFlatScore(response.id);
-        console.log("flat score: ", response.id);
 
         // **For Testing: Download the merged MIDI file**
         // const url = URL.createObjectURL(blob);

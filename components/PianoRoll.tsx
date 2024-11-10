@@ -197,12 +197,6 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       title,
     );
 
-    kickSynth.autostart = isPercussion.current;
-    tomSynth.autostart = isPercussion.current;
-    snareSynth.autostart = isPercussion.current;
-    hihatSynth.autostart = isPercussion.current;
-    crashSynth.autostart = isPercussion.current;
-
     const transport = Tone.getTransport();
     const startTime = getScrollTime(progress, duration);
 
@@ -241,9 +235,12 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       const duration = Math.max(note.duration, 0.01);
       transport.schedule((t) => {
         if (synth instanceof Tone.Player) {
-          synth.start(t);
+          if (!synth.loaded) synth.autostart = true;
+          else synth.start(t);
         } else {
-          synth.triggerAttackRelease(note.note, duration, t);
+          if (synth instanceof Tone.Sampler && synth.loaded) {
+            synth.triggerAttackRelease(note.note, duration, t);
+          } else synth.triggerAttackRelease(note.note, duration, t);
         }
       }, time);
     });
@@ -261,17 +258,6 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     activeNotesRef.current = new Set();
     drawPianoKeys();
   };
-
-  useEffect(() => {
-    // Clear Transport if playback is stopped when audio finishes
-    if (!isPlaying) {
-      const transport = Tone.getTransport();
-      transport.stop();
-      transport.cancel();
-      activeNotesRef.current = new Set();
-      drawPianoKeys();
-    }
-  }, [isPlaying]);
 
   // Sync vertical scrolling
   const syncScroll = () => {

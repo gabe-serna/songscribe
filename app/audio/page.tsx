@@ -6,6 +6,8 @@ import { AudioContext } from "./AudioProvider";
 import AudioForm from "./AudioForm";
 import handleMidiConversion from "@/utils/getMidi";
 import MidiEditor from "./MidiEditor";
+import ExportView from "./ExportView";
+import Embed from "flat-embed";
 
 export default function Page() {
   const { audioForm, audioStorage, setAudioStorage, songName } =
@@ -17,6 +19,7 @@ export default function Page() {
   const [isEditingComplete, setIsEditingComplete] = useState(false);
   const flatRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+  const [embed, setEmbed] = useState<Embed | null>(null);
 
   // Convert to Midi
   useEffect(() => {
@@ -38,25 +41,26 @@ export default function Page() {
   // Create Flat Score
   useEffect(() => {
     const container = flatRef.current;
-    console.log("flatScore has been updated:", flatScore);
-    console.log("container:", container);
     if (!container || !flatScore) return;
+
     console.log("Creating Flat.io embed");
     import("flat-embed")
       .then(({ default: Embed }) => {
-        new Embed(container, {
+        const flatEmbed = new Embed(container, {
           score: flatScore,
           embedParams: {
             appId: process.env.NEXT_PUBLIC_FLAT_APP_ID,
+            themePrimary: "#eab308",
+            themePrimaryDark: "#ca8a04",
             controlsPosition: "bottom",
           },
         });
+        setEmbed(flatEmbed);
       })
       .catch((error) => {
         console.error("Failed to load flat-embed:", error);
       });
   }, [flatScore, isEditingComplete]);
-  console.log("flatRef:", flatRef);
 
   // Warn user before leaving the page
   useEffect(() => {
@@ -99,10 +103,7 @@ export default function Page() {
         classNames="fade"
         unmountOnExit
       >
-        <div
-          ref={flatRef}
-          className="h-[75vh] w-full overflow-hidden rounded-3xl shadow-lg dark:shadow-stone-900"
-        />
+        <ExportView ref={flatRef} embed={embed} />
       </CSSTransition>
     </div>
   );
