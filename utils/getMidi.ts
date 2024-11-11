@@ -67,7 +67,6 @@ export default async function handleMidiConversion(
   if (needsMidi.length === 0) {
     return true;
   }
-  console.log("Converting to MIDI", needsMidi);
 
   const needMidiSingle = needsMidi.shift();
 

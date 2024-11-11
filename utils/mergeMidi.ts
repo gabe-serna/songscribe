@@ -61,7 +61,7 @@ export default async function mergeMidi(
   tempo: number,
   names: string[],
   songName: string,
-): Promise<ArrayBuffer> {
+): Promise<{ combinedMidiBuffer: ArrayBuffer; key: string }> {
   const combinedMidi = new Midi();
   let currentChannel = 0;
 
@@ -69,6 +69,7 @@ export default async function mergeMidi(
     { ticks: 0, timeSignature: [4, 4], measures: 0 },
   ];
   const mostCommonKeySignature = getMostCommonKeySignature(midiFiles);
+  const key = `${mostCommonKeySignature.key} ${mostCommonKeySignature.scale}`;
   combinedMidi.header.keySignatures = [mostCommonKeySignature];
   combinedMidi.header.setTempo(Math.round(tempo));
   combinedMidi.header.name = songName;
@@ -80,7 +81,6 @@ export default async function mergeMidi(
   // It just works, okay? ¯\_(ツ)_/¯
 
   let i = 0;
-  console.log("names", names);
   for (const file of midiFiles) {
     const midi = new Midi(file);
 
@@ -110,9 +110,8 @@ export default async function mergeMidi(
     i++;
   }
 
-  console.log(combinedMidi.header.keySignatures);
   const combinedMidiBuffer = combinedMidi.toArray();
-  return combinedMidiBuffer;
+  return { combinedMidiBuffer, key };
 }
 
 function getMostCommonKeySignature(

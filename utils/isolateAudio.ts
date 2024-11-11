@@ -21,7 +21,7 @@ export default async function isolateAudio(
         error.message.includes("Failed to fetch") ||
         error.message.includes("ERR_CONNECTION_REFUSED")
       ) {
-        console.log("failed to fetch error");
+        console.log("Error: Failed to Fetch");
         throw new Error(error.message);
       }
     });

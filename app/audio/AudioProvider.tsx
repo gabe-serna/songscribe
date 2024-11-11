@@ -15,6 +15,8 @@ interface AudioContextType {
   audioStorage: AudioStorage | null;
   setAudioStorage: React.Dispatch<React.SetStateAction<AudioStorage | null>>;
   songName: MutableRefObject<string>;
+  songKey: MutableRefObject<string>;
+  finalMidiFile: React.MutableRefObject<ArrayBuffer | null>;
 }
 
 // Create the context with default values
@@ -24,12 +26,16 @@ export const AudioContext = createContext<AudioContextType>({
   audioStorage: null,
   setAudioStorage: () => {},
   songName: { current: "" },
+  songKey: { current: "" },
+  finalMidiFile: { current: null },
 });
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [audioForm, setAudioForm] = useState<AudioFormData>({});
   const [audioStorage, setAudioStorage] = useState<AudioStorage | null>(null);
   const songName = useRef("");
+  const songKey = useRef("");
+  const finalMidiFile = useRef<ArrayBuffer | null>(null);
 
   return (
     <AudioContext.Provider
@@ -39,6 +45,8 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
         audioStorage,
         setAudioStorage,
         songName,
+        songKey,
+        finalMidiFile,
       }}
     >
       {children}

@@ -10,8 +10,7 @@ import ExportView from "./ExportView";
 import Embed from "flat-embed";
 
 export default function Page() {
-  const { audioForm, audioStorage, setAudioStorage, songName } =
-    useContext(AudioContext);
+  const { audioForm, audioStorage, setAudioStorage } = useContext(AudioContext);
   const [flatScore, setFlatScore] = useState<string | null>(null);
   const [formComplete, setFormComplete] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
@@ -104,7 +103,7 @@ export default function Page() {
         classNames="fade"
         unmountOnExit
       >
-        <ExportView ref={flatRef} embed={embed} />
+        <ExportView ref={flatRef} />
       </CSSTransition>
     </div>
   );

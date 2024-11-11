@@ -1,3 +1,4 @@
+"use client";
 import { forwardRef, useContext } from "react";
 import { AudioContext } from "./AudioProvider";
 import {
@@ -7,24 +8,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AudioStorage, Stem } from "@/utils/types";
-import { Download } from "lucide-react";
+import { Download, Undo } from "lucide-react";
 import { zipAllParts } from "@/utils/zipAll";
-import Embed from "flat-embed";
 
-interface Props {
-  embed: Embed | null;
-}
-
-const ExportView = forwardRef<HTMLDivElement, Props>(({ embed }, ref) => {
-  const { audioStorage, songName } = useContext(AudioContext);
-  // if (embed) {
-  //   embed
-  //     .getMusicXML()
-  //     .then((xml) => console.log("xml", xml))
-  //     .catch((err) => console.error(err));
-  // } else {
-  //   console.log("embed is null");
-  // }
+const ExportView = forwardRef<HTMLDivElement>((_props, ref) => {
+  const { audioStorage, audioForm, songName, songKey, finalMidiFile } =
+    useContext(AudioContext);
 
   return (
     <div className="flex w-full flex-col items-start justify-center max-xl:max-w-[800px] xl:flex-row xl:space-x-12">
@@ -48,25 +37,49 @@ const ExportView = forwardRef<HTMLDivElement, Props>(({ embed }, ref) => {
             <AccordionContent className="rounded-b-3xl border-2 border-t-0 border-border bg-stone-200 px-6 dark:bg-popover">
               <ol>
                 <span className="mb-2 flex items-center justify-between space-x-4">
-                  <li>Print</li>
+                  <li>Final Score Midi</li>
                   <Download
                     className="cursor-pointer stroke-pink-500 transition-colors hover:stroke-pink-700 dark:stroke-pink-600 dark:hover:stroke-pink-800"
                     onClick={() => {
-                      console.log("Print Button Clicked");
-                      // this shit isn't working wtf
+                      const midiBlob = new Blob([finalMidiFile.current!], {
+                        type: "audio/midi",
+                      });
+                      const url = URL.createObjectURL(midiBlob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `${songName.current}.mid`;
+                      a.click();
+                      URL.revokeObjectURL(url);
                     }}
                   />
                 </span>
-                <li>Midi</li>
-                <li>MusicXML</li>
-                <br />
+                {audioForm.audio_link && (
+                  <span className="mb-2 flex items-center justify-between space-x-4">
+                    <li>Original Audio</li>
+                    <Download
+                      className="cursor-pointer stroke-pink-500 transition-colors hover:stroke-pink-700 dark:stroke-pink-600 dark:hover:stroke-pink-800"
+                      onClick={() => {
+                        const url = URL.createObjectURL(audioForm.audio_file!);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `${songName.current}.mp3`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
+                    />
+                  </span>
+                )}
                 <span className="mb-2 flex items-center justify-between space-x-4">
-                  <li>Midi and Audio for All Parts</li>
+                  <li>Midi and Audio for Each Instrument</li>
                   <Download
                     className="cursor-pointer stroke-pink-500 transition-colors hover:stroke-pink-700 dark:stroke-pink-600 dark:hover:stroke-pink-800"
                     onClick={() => zipAllParts(audioStorage!, songName.current)}
                   />
                 </span>
+                <br />
+                <li className="italic text-card-foreground">
+                  {songKey.current}, {audioForm.tempo} BPM
+                </li>
               </ol>
             </AccordionContent>
           </AccordionItem>
@@ -82,7 +95,7 @@ const ExportView = forwardRef<HTMLDivElement, Props>(({ embed }, ref) => {
                   if (!stem.midiBlob) return;
                   return (
                     <span
-                      key="key"
+                      key={key}
                       className="mb-2 flex items-center justify-between space-x-4"
                     >
                       <li>{`${key.charAt(0).toUpperCase()}${key.substring(1)}`}</li>
@@ -115,7 +128,7 @@ const ExportView = forwardRef<HTMLDivElement, Props>(({ embed }, ref) => {
                   if (!stem.audioBlob) return;
                   return (
                     <span
-                      key="key"
+                      key={key}
                       className="mb-2 flex items-center justify-between space-x-4"
                     >
                       <li>{`${key.charAt(0).toUpperCase()}${key.substring(1)}`}</li>
@@ -135,6 +148,13 @@ const ExportView = forwardRef<HTMLDivElement, Props>(({ embed }, ref) => {
                 })}
               </ol>
             </AccordionContent>
+          </AccordionItem>
+          <AccordionItem
+            value="back"
+            onClick={() => (window.location.href = "/audio")}
+            className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-lg transition-colors xl:max-w-[300px]"
+          >
+            Convert Again <Undo className="size-4" />
           </AccordionItem>
         </div>
       </Accordion>

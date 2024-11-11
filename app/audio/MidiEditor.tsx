@@ -39,8 +39,14 @@ const MidiEditor = forwardRef(
     { conversionFlag, isMidiComplete, setFlatScore }: Props,
     ref: React.ForwardedRef<HTMLDivElement>,
   ) => {
-    const { audioStorage, setAudioStorage, audioForm, songName } =
-      useContext(AudioContext);
+    const {
+      audioStorage,
+      setAudioStorage,
+      audioForm,
+      songName,
+      finalMidiFile,
+      songKey,
+    } = useContext(AudioContext);
     const [selectedMidi, setSelectedMidi] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [midiOpen, setMidiOpen] = useState(false);
@@ -152,7 +158,6 @@ const MidiEditor = forwardRef(
 
       try {
         const names = Object.keys(audioStorage);
-        console.log("names", names);
 
         const midiFiles = await Promise.all(
           Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
@@ -163,13 +168,17 @@ const MidiEditor = forwardRef(
           ),
         );
 
-        const songMidi = await mergeMidi(
+        const { combinedMidiBuffer, key } = await mergeMidi(
           midiFiles,
           audioForm.tempo as number,
           names,
           songName.current,
         );
-        const blob = new Blob([songMidi], { type: "application/octet-stream" });
+        finalMidiFile.current = combinedMidiBuffer;
+        songKey.current = key;
+        const blob = new Blob([finalMidiFile.current], {
+          type: "application/octet-stream",
+        });
         console.log("creating flat score...");
         const response = await createScore(blob, songName.current);
         setFlatScore(response.id);
