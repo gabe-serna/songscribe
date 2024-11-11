@@ -9,69 +9,79 @@ export default async function isolateAudio(
   else await isolateTracks();
 
   async function isolateTracks() {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/split-audio`,
-        {
-          method: "POST",
-          mode: "cors",
-          body: formData,
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to isolate audio");
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/split-audio`,
+      {
+        method: "POST",
+        mode: "cors",
+        body: formData,
+      },
+    ).catch((error) => {
+      if (
+        error.message.includes("Failed to fetch") ||
+        error.message.includes("ERR_CONNECTION_REFUSED")
+      ) {
+        console.log("failed to fetch error");
+        throw new Error(error.message);
       }
+    });
 
-      JSZip.loadAsync(response.blob()).then((zip) => {
-        zip.forEach((relativePath, file) => {
-          file.async("blob").then((blob) => {
-            const name = relativePath.split(".")[0];
-            setAudioStorage(
-              (prev) =>
-                ({
-                  ...prev,
-                  [name]: { name, audioBlob: blob, midiBlob: null },
-                }) as AudioStorage,
-            );
-          });
+    if (response) {
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+    } else throw new Error("0");
+
+    JSZip.loadAsync(response.blob()).then((zip) => {
+      zip.forEach((relativePath, file) => {
+        file.async("blob").then((blob) => {
+          const name = relativePath.split(".")[0];
+          setAudioStorage(
+            (prev) =>
+              ({
+                ...prev,
+                [name]: { name, audioBlob: blob, midiBlob: null },
+              }) as AudioStorage,
+          );
         });
       });
-      console.log("Audio isolated successfully");
-    } catch (error) {
-      console.error(error);
-      alert("Error converting isolating audio");
-    }
+    });
+    console.log("Audio isolated successfully");
   }
 
   async function alignSingle() {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/align-audio`,
-        {
-          method: "POST",
-          mode: "cors",
-          body: formData,
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to isolate audio");
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/align-audio`,
+      {
+        method: "POST",
+        mode: "cors",
+        body: formData,
+      },
+    ).catch((error) => {
+      if (
+        error.message.includes("Failed to fetch") ||
+        error.message.includes("ERR_CONNECTION_REFUSED")
+      ) {
+        console.log("failed to fetch error");
+        throw new Error(error.message);
       }
+    });
 
-      const blob = await response.blob();
-      setAudioStorage(
-        (prev) =>
-          ({
-            ...prev,
-            no_vocals: { name: "no_vocals", audioBlob: blob, midiBlob: null },
-          }) as AudioStorage,
-      );
+    if (response) {
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+    } else throw new Error("0");
 
-      console.log("Audio aligned successfully");
-    } catch (error) {
-      console.error(error);
-      alert("Error converting aligning audio");
-    }
+    const blob = await response.blob();
+    setAudioStorage(
+      (prev) =>
+        ({
+          ...prev,
+          no_vocals: { name: "no_vocals", audioBlob: blob, midiBlob: null },
+        }) as AudioStorage,
+    );
+
+    console.log("Audio aligned successfully");
   }
 }

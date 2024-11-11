@@ -87,6 +87,7 @@ export default function Page() {
         timeout={700}
         classNames="fade"
         onExited={() => setIsEditingComplete(true)}
+        appear
         unmountOnExit
       >
         <MidiEditor

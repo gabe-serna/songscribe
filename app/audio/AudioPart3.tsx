@@ -23,9 +23,9 @@ const formSchema = z.object({
 });
 
 export default function AudioPart3({
-  setIsSubmitting,
+  setIsPart3Visible,
 }: {
-  setIsSubmitting: Dispatch<SetStateAction<boolean>>;
+  setIsPart3Visible: Dispatch<SetStateAction<boolean>>;
 }) {
   const { audioForm, setAudioForm } = useContext(AudioContext);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,7 +39,7 @@ export default function AudioPart3({
     const end_time = values.end_time;
 
     setAudioForm({ ...audioForm, tempo, start_time, end_time });
-    setIsSubmitting(true);
+    setIsPart3Visible(false);
   }
 
   return (

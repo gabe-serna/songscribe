@@ -18,11 +18,15 @@ export default function AudioForm({
 }) {
   const { audioForm, setAudioForm, setAudioStorage, songName } =
     useContext(AudioContext);
-  const isPart1Complete = audioForm.audio_file || audioForm.audio_link;
   const [isPart2Visible, setIsPart2Visible] = useState(false);
   const [isPart3Visible, setIsPart3Visible] = useState(false);
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoadingVisible, setisLoadingVisible] = useState(false);
+  const [isLoadingFinished, setisLoadingFinished] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isPart1Complete =
+    audioForm.audio_file != undefined ||
+    audioForm.audio_link != undefined ||
+    !isLoadingFinished;
   const { toast } = useToast();
 
   const part1Ref = useRef(null);
@@ -41,56 +45,85 @@ export default function AudioForm({
     // Set Tempo
     async function submitForm() {
       console.log("submitting form");
-      try {
-        // Get File if YT Link
-        let file = audioForm.audio_file;
-        if (audioForm.audio_link && !file) {
-          const formData = new FormData();
-          formData.append("youtube_url", audioForm.audio_link);
-          file = await getAudioFromURL(formData, setAudioForm);
-        }
-
-        if (!file) {
-          setIsSubmitting(false);
-          throw new Error("No audio file provided");
-        }
-        console.log("audio retrieved: ", file.name);
-
-        // Get Tempo
-        let tempo = 120;
-        if (!audioForm.tempo) {
-          tempo = await getTempo(file);
-          setAudioForm({ ...audioForm, tempo });
-        } else tempo = audioForm.tempo;
-        console.log("tempo: ", tempo);
-        songName.current = file.name.split(".")[0];
-
-        // Create Form Data
+      // Get File if YT Link
+      let file = audioForm.audio_file;
+      if (audioForm.audio_link && !file) {
         const formData = new FormData();
-        formData.append("audio_file", file);
-        formData.append("separation_mode", `${audioForm.separation_mode}`);
-        formData.append("tempo", `${tempo}`);
-        if (audioForm.start_time)
-          formData.append("start_time", `${audioForm.start_time}`);
-        if (audioForm.end_time)
-          formData.append("end_time", `${audioForm.end_time}`);
+        formData.append("youtube_url", audioForm.audio_link);
+        file = await getAudioFromURL(formData, setAudioForm);
+      }
 
-        // Make API Request
-        isolateAudio(formData, setAudioStorage).then(() => {
+      if (!file) {
+        // This shouldn't happen
+        setIsSubmitting(false);
+        setisLoadingVisible(false);
+        throw new Error("No audio file provided");
+      }
+      console.log("audio retrieved: ", file.name);
+
+      // Get Tempo
+      let tempo = 120;
+      if (!audioForm.tempo) {
+        tempo = await getTempo(file);
+        setAudioForm({ ...audioForm, tempo });
+      } else tempo = audioForm.tempo;
+      console.log("tempo: ", tempo);
+      songName.current = file.name.split(".")[0];
+
+      // Create Form Data
+      const formData = new FormData();
+      formData.append("audio_file", file);
+      formData.append("separation_mode", `${audioForm.separation_mode}`);
+      formData.append("tempo", `${tempo}`);
+      if (audioForm.start_time)
+        formData.append("start_time", `${audioForm.start_time}`);
+      if (audioForm.end_time)
+        formData.append("end_time", `${audioForm.end_time}`);
+
+      // Make API Request
+      isolateAudio(formData, setAudioStorage)
+        .then(() => {
           setTimeout(() => {
             setIsSubmitting(false);
-            setisLoading(false);
+            setisLoadingVisible(false);
           }, 2000);
+        })
+        .catch((error) => {
+          setAudioForm({});
+          setIsSubmitting(false);
+          setisLoadingVisible(false);
+          let message: string;
+
+          if (
+            error.message.includes("Failed to fetch") ||
+            error.message.includes("ERR_CONNECTION_REFUSED")
+          ) {
+            message = "Make sure you have the backend running locally";
+          } else {
+            switch (error.message) {
+              case "404":
+                message = "Endpoint not Found";
+                break;
+              case "400":
+                message = "Invalid Form Data";
+                break;
+              case "422":
+                message = "Invalid Form Syntax";
+                break;
+              case "500":
+                message = "Internal Server Error";
+                break;
+              default:
+                message = "Failed to isolate audio";
+                break;
+            }
+          }
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Error Isolating Audio!",
+            description: message,
+          });
         });
-      } catch (error) {
-        console.error(error);
-        setIsSubmitting(false);
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Error Isolating Audio!",
-          description: "Make sure you have the backend running locally.",
-        });
-      }
     }
     submitForm();
   }, [isSubmitting]);
@@ -140,7 +173,11 @@ export default function AudioForm({
         in={isPart3Visible}
         timeout={700}
         classNames="fade"
-        onExited={() => setisLoading(true)}
+        onExited={() => {
+          setisLoadingVisible(true);
+          setisLoadingFinished(false);
+          setIsSubmitting(true);
+        }}
         unmountOnExit
       >
         <div
@@ -150,16 +187,24 @@ export default function AudioForm({
           <h1 className="text-center text-3xl font-bold lg:text-4xl">
             Customize Optional Parameters
           </h1>
-          <AudioPart3 setIsSubmitting={setIsSubmitting} />
+          <AudioPart3 setIsPart3Visible={setIsPart3Visible} />
         </div>
       </CSSTransition>
 
       <CSSTransition
         nodeRef={loadingRef}
-        in={isLoading}
+        in={isLoadingVisible}
         timeout={700}
         classNames="fade"
-        onExited={() => setFormComplete(true)}
+        onExited={() => {
+          if (
+            audioForm.audio_file != undefined ||
+            audioForm.audio_link != undefined
+          ) {
+            setFormComplete(true);
+          }
+          setisLoadingFinished(true);
+        }}
         unmountOnExit
       >
         <div
