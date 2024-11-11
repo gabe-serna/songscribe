@@ -277,7 +277,7 @@ const MidiEditor = forwardRef(
                 <AccordionItem
                   value="next"
                   onClick={() => setSelectedMidi(selectedMidi + 1)}
-                  className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-lg transition-colors xl:max-w-[300px]"
+                  className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-md transition-colors xl:max-w-[300px]"
                 >
                   Next <ArrowRight className="size-4" />
                 </AccordionItem>
@@ -289,7 +289,7 @@ const MidiEditor = forwardRef(
                     if (!isMidiComplete) return;
                     startMerge();
                   }}
-                  className={`flex w-full items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-lg transition-colors xl:max-w-[300px] ${isMidiComplete ? "button-action cursor-pointer" : "button-action-disabled cursor-default"}`}
+                  className={`flex w-full items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-md transition-colors xl:max-w-[300px] ${isMidiComplete ? "button-action cursor-pointer" : "button-action-disabled cursor-default"}`}
                 >
                   {!isSubmitting ? "Export" : "Exporting..."}
                 </AccordionItem>

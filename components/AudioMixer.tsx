@@ -23,7 +23,9 @@ export default function AudioMixer({ name, controls }: Props) {
       <Label htmlFor={htmlName} className="font-heading mt-4 font-bold">
         {name}
       </Label>
-      <p className="w-14 text-center text-card-foreground">{volume}</p>
+      <p className="w-14 select-none text-center text-card-foreground">
+        {volume}
+      </p>
       <Slider
         name={htmlName}
         min={0}

@@ -44,7 +44,9 @@ export default function MidiSlider({
           step={step}
           onValueChange={(val) => setValue(val[0])}
         />
-        <p className="w-14 text-right text-card-foreground">{value}</p>
+        <p className="w-14 select-none text-right text-card-foreground">
+          {value}
+        </p>
       </div>
     </span>
   );

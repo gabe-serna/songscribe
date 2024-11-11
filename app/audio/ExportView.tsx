@@ -152,7 +152,7 @@ const ExportView = forwardRef<HTMLDivElement>((_props, ref) => {
           <AccordionItem
             value="back"
             onClick={() => (window.location.href = "/audio")}
-            className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-lg transition-colors xl:max-w-[300px]"
+            className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-md transition-colors xl:max-w-[300px]"
           >
             Convert Again <Undo className="size-4" />
           </AccordionItem>

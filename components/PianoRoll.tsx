@@ -234,13 +234,20 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
       const duration = Math.max(note.duration, 0.01);
       transport.schedule((t) => {
-        if (synth instanceof Tone.Player) {
-          if (!synth.loaded) synth.autostart = true;
-          else synth.start(t);
-        } else {
-          if (synth instanceof Tone.Sampler && synth.loaded) {
+        switch (true) {
+          case synth instanceof Tone.Player:
+            if (!synth.loaded) synth.autostart = true;
+            else synth.start(t);
+            break;
+
+          case synth instanceof Tone.Sampler:
+            if (synth.loaded)
+              synth.triggerAttackRelease(note.note, duration, t);
+            break;
+
+          default:
             synth.triggerAttackRelease(note.note, duration, t);
-          } else synth.triggerAttackRelease(note.note, duration, t);
+            break;
         }
       }, time);
     });

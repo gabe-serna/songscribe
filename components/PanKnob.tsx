@@ -105,86 +105,84 @@ const PanKnob = ({ value, setValue }: Props) => {
   }, [value]);
 
   return (
-    <div
-      ref={knobRef}
-      onPointerDown={handlePointerDown}
-      className="mt-3 flex touch-none flex-col items-center"
-    >
-      <Knob
-        size={size}
-        angleOffset={-140}
-        angleRange={280}
-        min={min}
-        max={max}
-        snap={true}
-        steps={10}
-        value={value}
-        onChange={(val) => {
-          if (Math.abs(value - val) > 50) return;
-          setTimeout(() => setValue(Math.round(val / 10) * 10), 10);
-        }}
-      >
-        {/* Background Arc */}
-        <CustomArc
-          value={min}
-          min={min}
-          max={max}
+    <div ref={knobRef} className="mt-3 flex touch-none flex-col items-center">
+      <span onPointerDown={handlePointerDown}>
+        <Knob
           size={size}
-          radius={arcRadius}
-          arcWidth={arcWidth}
           angleOffset={-140}
           angleRange={280}
-          color="#ffffff"
-          className="stroke-secondary"
-        />
-        <CustomArc
-          value={max}
           min={min}
           max={max}
-          size={size}
-          radius={arcRadius}
-          arcWidth={arcWidth}
-          angleOffset={-140}
-          angleRange={280}
-          color="#ffffff"
-          className="stroke-secondary"
-        />
-        {/* Value Arc */}
-        <CustomArc
+          snap={true}
+          steps={10}
           value={value}
-          min={min}
-          max={max}
-          size={size}
-          radius={arcRadius}
-          arcWidth={arcWidth}
-          angleOffset={-140}
-          angleRange={280}
-          color="#FF0000"
-          className="stroke-pink-500 dark:stroke-pink-400"
-        />
-        {/* Circular Pointer */}
-        <Pointer
-          width={pointerSize}
-          height={pointerSize}
-          radius={pointerRadius}
-          type="circle"
-          color="#FC5A96"
-          className="fill-transparent"
-        />
-      </Knob>
+          onChange={(val) => {
+            if (Math.abs(value - val) > 50) return;
+            setTimeout(() => setValue(Math.round(val / 10) * 10), 10);
+          }}
+        >
+          {/* Background Arc */}
+          <CustomArc
+            value={min}
+            min={min}
+            max={max}
+            size={size}
+            radius={arcRadius}
+            arcWidth={arcWidth}
+            angleOffset={-140}
+            angleRange={280}
+            color="#ffffff"
+            className="stroke-secondary"
+          />
+          <CustomArc
+            value={max}
+            min={min}
+            max={max}
+            size={size}
+            radius={arcRadius}
+            arcWidth={arcWidth}
+            angleOffset={-140}
+            angleRange={280}
+            color="#ffffff"
+            className="stroke-secondary"
+          />
+          {/* Value Arc */}
+          <CustomArc
+            value={value}
+            min={min}
+            max={max}
+            size={size}
+            radius={arcRadius}
+            arcWidth={arcWidth}
+            angleOffset={-140}
+            angleRange={280}
+            color="#FF0000"
+            className="stroke-pink-500 dark:stroke-pink-400"
+          />
+          {/* Circular Pointer */}
+          <Pointer
+            width={pointerSize}
+            height={pointerSize}
+            radius={pointerRadius}
+            type="circle"
+            color="#FC5A96"
+            className="fill-transparent"
+          />
+        </Knob>
+      </span>
       {/* Display Current Value */}
       <div className="relative">
-        <span className="absolute -left-1 -top-3 text-xs font-bold text-stone-400 dark:text-stone-500">
+        <span className="absolute -left-1 -top-3 select-none text-xs font-bold text-stone-400 dark:text-stone-500">
           L
         </span>
         <p
-          className={`mt-1 w-12 text-center text-card-foreground ${
+          className={`mt-1 w-12 select-none text-center text-card-foreground ${
             value < 0 ? "-translate-x-[0.1875rem]" : ""
           }`}
         >
           {value.toFixed(0)}
         </p>
-        <span className="absolute -right-1.5 -top-3 text-xs font-bold text-stone-400 dark:text-stone-500">
+        <span className="absolute -right-1.5 -top-3 select-none text-xs font-bold text-stone-400 dark:text-stone-500">
           R
         </span>
       </div>
