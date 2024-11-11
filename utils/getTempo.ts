@@ -10,8 +10,9 @@ export default async function getTempo(file: File): Promise<number> {
     tempo = await analyze(monoAudio);
     tempo = Math.round(tempo);
   } catch {
-    console.log("Tempo unable to be detected! Defaulting to 120 bpm");
-    console.log("Try adding a tempo manually to fix the issue.");
+    console.error(
+      "Tempo unable to be detected! Defaulting to 120 bpm.\n\nAdd a tempo manually to fix the issue.",
+    );
     tempo = 120;
   }
 

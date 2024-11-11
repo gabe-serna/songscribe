@@ -138,6 +138,21 @@ const PianoRoll: React.FC<PianoRollProps> = ({
         pianoKeyWidth,
         noteHeight,
       );
+
+      // **Add the octave number to 'C' keys**
+      if (midiNote % 12 === 0) {
+        const octave = Math.floor(midiNote / 12) - 1;
+
+        ctx.fillStyle = "black";
+        ctx.font = "6px Arial";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+
+        const textX = pianoKeyWidth - 8;
+        const textY = canvasHeight - y - noteHeight / 2;
+
+        ctx.fillText(octave.toString(), textX, textY);
+      }
     }
   };
 

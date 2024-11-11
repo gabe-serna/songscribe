@@ -118,7 +118,7 @@ const MidiEditor = forwardRef(
         minimum_note_length: formData.get("minimum_note_length") as string,
       };
       const maxFreq = parseInt(formData.get("maximum_frequency") as string);
-      if (maxFreq < 18000) {
+      if (maxFreq < 13000) {
         adjustments.maximum_frequency = maxFreq.toString();
       }
       const minFreq = parseInt(formData.get("minimum_frequency") as string);

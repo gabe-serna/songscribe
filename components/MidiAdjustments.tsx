@@ -33,18 +33,20 @@ export default function MidiAdjustments({
       <MidiSlider
         name="Minimum Frequency"
         defaultValue={0}
-        max={5000}
+        max={2000}
         min={0}
         step={100}
         resetSignal={reset}
+        outputNote
       />
       <MidiSlider
         name="Maximum Frequency"
-        defaultValue={18000}
-        max={18000}
-        min={8000}
-        step={200}
+        defaultValue={13000}
+        max={13000}
+        min={100}
+        step={100}
         resetSignal={reset}
+        outputNote
       />
       <MidiSlider
         // Onset Threshold

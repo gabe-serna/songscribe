@@ -1,6 +1,7 @@
 "use client";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import getNoteName from "@/utils/getNoteName";
 import { useEffect, useRef, useState } from "react";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
   step: number;
   resetSignal: boolean;
   className?: string;
+  outputNote?: boolean;
 }
 
 export default function MidiSlider({
@@ -21,6 +23,7 @@ export default function MidiSlider({
   step,
   resetSignal,
   className,
+  outputNote = false,
 }: Props) {
   const [value, setValue] = useState(defaultValue);
   const htmlName = name.toLowerCase().replace(/\s/g, "_");
@@ -45,7 +48,7 @@ export default function MidiSlider({
           onValueChange={(val) => setValue(val[0])}
         />
         <p className="w-14 select-none text-right text-card-foreground">
-          {value}
+          {!outputNote ? value : getNoteName(value)}
         </p>
       </div>
     </span>
