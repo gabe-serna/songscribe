@@ -27,6 +27,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import sliderFrequencyScaling from "@/utils/sliderFrequencyScaling";
 
 interface Props {
   conversionFlag: Dispatch<SetStateAction<boolean>>;
@@ -117,12 +118,20 @@ const MidiEditor = forwardRef(
         frame_threshold: formData.get("confidence_threshold") as string,
         minimum_note_length: formData.get("minimum_note_length") as string,
       };
-      const maxFreq = parseInt(formData.get("maximum_frequency") as string);
+      // Conditionally Append Maximum Frequency
+      const frequencies = sliderFrequencyScaling();
+      const maxIndex = parseInt(formData.get("maximum_frequency") as string);
+      const maxFreq = frequencies[maxIndex];
       if (maxFreq < 13000) {
+        console.log("maxFreq", maxFreq);
         adjustments.maximum_frequency = maxFreq.toString();
       }
-      const minFreq = parseInt(formData.get("minimum_frequency") as string);
+
+      // Conditionally Append Minimum Frequency
+      const minIndex = parseInt(formData.get("minimum_frequency") as string);
+      const minFreq = frequencies[minIndex];
       if (minFreq > 0) {
+        console.log("minFreq", minFreq);
         adjustments.minimum_frequency = minFreq.toString();
       }
 
