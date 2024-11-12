@@ -1,96 +1,75 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
+<a href="https://songscribe.xyz">
+<p align="center">
+  <img alt="songscribe logo" src="https://i.ibb.co/QnxT7zp/songscribe-banner.png" width="500">
+</p>
 </a>
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+<h3 align="center">
+  <i>The fastest way to turn any song into sheet music.</i>
+</h3>
+
+<hr>
+<br>
 
 <p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
+  <a href="#features"><strong>Features</strong></a> ♫
+  <a href="#why"><strong>Why?</strong></a> ♫
+  <a href="#quick-start"><strong>Quick Start</strong></a> ♫
+  <a href="#technologies-used"><strong>Technologies Used</strong></a> ♫
   <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
 </p>
 <br/>
 
 ## Features
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+> This is Songscribe! A web application for musicians to jumpstart the process of transcribing music. Within minutes, you'll have the perfect starting point for a complete transcription of a song.
 
-## Demo
+- Upload a song with an audio file or YouTube URL
+- Machine-learning powered instrument splitter / vocal remover
+  - Choose between 4 presets: Solo, Duet, Small Band, and Full Band
+- Convert audio to MIDI for automatic transcription
+- Customize the MIDI transcription with many parameters
+- Integrated audio and MIDI playback and visualization
+- Generate sheet music for final score with playback
+- Export isolated stems and MIDI files
+- Print or export sheet music as PDF
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+## Why?
 
-## Deploy to Vercel
+As a musician, I've always loved being able to hear something interesting in a song, transcribe it, and understand what it is so that I can use it in my own playing or compositions. Cracking that elusive code behind what makes something sound good is always so satisfying.
 
-Vercel deployment will guide you through creating a Supabase account and project.
+_Well… minus the part where I loop 2 seconds of the YouTube recording at 0.5x speed for an hour to figure out what one chord is._
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+That's why I made **Songscribe**, a tool for jumpstarting the transcription process. By utilizing machine-learning algorithms to isolate each instrument and convert it to MIDI, you will have an incredible starting point for transcribing _every part_ of a song in minutes. Not hours—**minutes**.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+## Quick Start
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+You can get started with Songscribe by visiting [songscribe.xyz](https://songscribe.xyz).
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+> <p>Currently, the API backend powering the audio isolation and audio to MIDI conversion is not hosted anywhere (<i>the machine learning models are a bit too intensive for free hosting solutions</i>). <br><br> <strong>This means you will have to run the API locally.</strong> Extensive documentation on how to do so have been provided for you <a href="https://github.com/gabe-serna/songscribe-api?tab=readme-ov-file#songscribe-api">here</a> for this reason.</p>
 
-## Clone and run locally
+## Technologies Used
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+Here is a quick breakdown of all the main technologies used to create Songscribe.
 
-2. Create a Next.js app using the Supabase Starter template npx command
+Frontend:
 
-   ```bash
-   npx create-next-app -e with-supabase
-   ```
+- React
+- Next.js
+- TailwindCSS
+- shadcn/ui
+- Libraries:
+  - **[Tone.js](https://github.com/Tonejs/Tone.js)**- MIDI playblack and visualization
+  - **[wavesurfer.js](https://github.com/katspaugh/wavesurfer.js)**- Waveform Visualization
+  - **[Flat Embed](https://github.com/FlatIO/embed-client)**- Embedded sheet music viewer
 
-3. Use `cd` to change into the app's directory
+Backend:
 
-   ```bash
-   cd name-of-new-app
-   ```
-
-4. Rename `.env.example` to `.env.local` and update the following:
-
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
-
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
-
-5. You can now run the Next.js local development server:
-
-   ```bash
-   npm run dev
-   ```
-
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
-
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
-
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+- Python
+- Libraries:
+  - **[Moseca](https://github.com/fabiogra/moseca)**- Instrument separation
+  - **[Spotify Basic Pitch](https://github.com/spotify/basic-pitch)**- Audio to MIDI conversion
 
 ## Feedback and issues
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+Please file feedback and issues over on [Github Issues](https://github.com/gabe-serna/songscribe/issues/new).
