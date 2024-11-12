@@ -34,6 +34,8 @@
 - Export isolated stems and MIDI files
 - Print or export sheet music as PDF
 
+<br/>
+
 ## Why?
 
 As a musician, I've always loved being able to hear something interesting in a song, transcribe it, and understand what it is so that I can use it in my own playing or compositions. Cracking that elusive code behind what makes something sound good is always so satisfying.
@@ -42,11 +44,15 @@ _Well… minus the part where I loop 2 seconds of the YouTube recording at 0.5x 
 
 That's why I made **Songscribe**, a tool for jumpstarting the transcription process. By utilizing machine-learning algorithms to isolate each instrument and convert it to MIDI, you will have an incredible starting point for transcribing _every part_ of a song in minutes. Not hours—**minutes**.
 
+<br/>
+
 ## Quick Start
 
 You can get started with Songscribe by visiting [songscribe.xyz](https://songscribe.xyz).
 
 > <p>Currently, the API backend powering the audio isolation and audio to MIDI conversion is not hosted anywhere (<i>the machine learning models are a bit too intensive for free hosting solutions</i>). <br><br> <strong>This means you will have to run the API locally.</strong> Extensive documentation on how to do so have been provided for you <a href="https://github.com/gabe-serna/songscribe-api?tab=readme-ov-file#songscribe-api">here</a> for this reason.</p>
+
+<br/>
 
 ## Technologies Used
 
@@ -69,6 +75,8 @@ Backend:
 - Libraries:
   - **[Moseca](https://github.com/fabiogra/moseca)**- Instrument separation
   - **[Spotify Basic Pitch](https://github.com/spotify/basic-pitch)**- Audio to MIDI conversion
+
+<br/>
 
 ## Feedback and issues
 
