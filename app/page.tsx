@@ -1,6 +1,7 @@
 import GetStartedButton from "@/components/GetStartedButton";
 import HomeLogo from "@/components/HomeLogo";
 import BenefitSection from "@/app/BenefitSection";
+import ImpactSection from "./ImpactSection";
 
 export default async function Home() {
   return (
@@ -23,16 +24,7 @@ export default async function Home() {
           <HomeLogo />
         </section>
         <BenefitSection />
-        <section
-          id="impact"
-          className="sticky top-0 z-30 flex h-[200vh] w-[calc(100vw-12px)] bg-foreground"
-        >
-          <div className="sticky top-[30vh] my-[30vh] flex h-[40vh] w-full items-center justify-center bg-yellow-500">
-            <h1 className="text-3xl text-background">
-              Transcribing takes Hours
-            </h1>
-          </div>
-        </section>
+        <ImpactSection />
       </div>
     </>
   );
