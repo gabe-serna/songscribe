@@ -1,12 +1,13 @@
 import GetStartedButton from "@/components/GetStartedButton";
 import HomeLogo from "@/components/HomeLogo";
+import BenefitSection from "@/app/BenefitSection";
 
 export default async function Home() {
   return (
     <div className="flex w-full flex-col items-center justify-center sm:px-20 xl:px-24">
       <section
         id="hero"
-        className="flex w-full max-w-[1000px] flex-shrink flex-col items-center justify-between lg:flex-row xl:max-w-[1200px]"
+        className="flex min-h-screen w-full max-w-[1000px] flex-shrink flex-col items-center justify-center lg:flex-row lg:justify-between xl:max-w-[1200px]"
       >
         <div className="flex flex-col max-lg:items-center">
           <h1 className="text-3xl font-semibold max-lg:text-center max-sm:max-w-[15ch] sm:w-[20ch] sm:text-4xl xl:w-[20ch] xl:text-5xl xl:leading-tight">
@@ -20,6 +21,7 @@ export default async function Home() {
         </div>
         <HomeLogo />
       </section>
+      <BenefitSection />
     </div>
   );
 }

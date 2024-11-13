@@ -1,16 +1,18 @@
-"use client";
-
-import { useTheme } from "next-themes";
+import React from "react";
 
 export default function HomeLogo() {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
   return (
-    <img
-      src={isDark ? "/logo-dark.png" : "/logo-light.png"}
-      alt="logo"
-      className="mt-8 h-auto w-[200px] sm:w-[300px] lg:mt-0 xl:w-[400px]"
-    />
+    <div className="mt-8 h-auto w-[200px] sm:w-[300px] lg:mt-0 xl:w-[400px]">
+      <img
+        src="/logo-light.png"
+        alt="Songscribe Logo - Light Mode"
+        className="block h-auto w-full dark:hidden"
+      />
+      <img
+        src="/logo-dark.png"
+        alt="Songscribe Logo - Dark Mode"
+        className="hidden h-auto w-full dark:block"
+      />
+    </div>
   );
 }
