@@ -42,7 +42,7 @@ export default function BenefitSection() {
   return (
     <section
       id="benefits"
-      className="flex min-h-screen w-full max-w-[1000px] flex-shrink flex-row items-start justify-between lg:flex-row xl:max-w-[1200px]"
+      className="sticky top-[-240vh] z-20 flex min-h-screen w-full max-w-[1000px] flex-shrink flex-row items-start justify-between bg-background lg:top-[-250vh] lg:flex-row xl:max-w-[1200px]"
     >
       <div id="benefit-cards" className="mt-8">
         <BenefitCard
