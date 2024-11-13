@@ -304,6 +304,7 @@ const MidiEditor = forwardRef(
                   aria-disabled={!isMidiComplete}
                   onClick={() => {
                     if (!isMidiComplete) return;
+                    setPageUpdate(!pageUpdate);
                     startMerge();
                   }}
                   className={`flex w-full items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-md transition-colors xl:max-w-[300px] ${isMidiComplete ? "button-action cursor-pointer" : "button-action-disabled cursor-default"}`}
