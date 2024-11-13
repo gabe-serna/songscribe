@@ -93,12 +93,16 @@ const ExportView = forwardRef<HTMLDivElement>((_props, ref) => {
                   audioStorage as Record<keyof AudioStorage, Stem>,
                 ).map(([key, stem]) => {
                   if (!stem.midiBlob) return;
+
+                  let name = key.split("_").join(" ");
+                  name = name.replace(/\b\w/g, (char) => char.toUpperCase());
+
                   return (
                     <span
                       key={key}
                       className="mb-2 flex items-center justify-between space-x-4"
                     >
-                      <li>{`${key.charAt(0).toUpperCase()}${key.substring(1)}`}</li>
+                      <li>{name}</li>
                       <Download
                         className="cursor-pointer stroke-pink-500 transition-colors hover:stroke-pink-700 dark:stroke-pink-600 dark:hover:stroke-pink-800"
                         onClick={() => {
@@ -126,12 +130,16 @@ const ExportView = forwardRef<HTMLDivElement>((_props, ref) => {
                   audioStorage as Record<keyof AudioStorage, Stem>,
                 ).map(([key, stem]) => {
                   if (!stem.audioBlob) return;
+
+                  let name = key.split("_").join(" ");
+                  name = name.replace(/\b\w/g, (char) => char.toUpperCase());
+
                   return (
                     <span
                       key={key}
                       className="mb-2 flex items-center justify-between space-x-4"
                     >
-                      <li>{`${key.charAt(0).toUpperCase()}${key.substring(1)}`}</li>
+                      <li>{name}</li>
                       <Download
                         className="cursor-pointer stroke-pink-500 transition-colors hover:stroke-pink-700 dark:stroke-pink-600 dark:hover:stroke-pink-800"
                         onClick={() => {
