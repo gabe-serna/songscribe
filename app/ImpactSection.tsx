@@ -87,7 +87,7 @@ export default function ImpactSection() {
             minutes
           </motion.h1>
           <motion.div
-            className="absolute -right-5 h-2 w-20 rounded-[350%] bg-yellow-600 max-sm:left-0 max-sm:mx-auto sm:-right-3"
+            className="absolute -right-5 h-2 w-20 rounded-[350%] bg-red-600 max-sm:left-0 max-sm:mx-auto sm:-right-3"
             style={{
               opacity: useTransform(() => {
                 const scroll = containerScrollY.get();
@@ -111,27 +111,32 @@ export default function ImpactSection() {
                 if (scrollPercentage < 0.25) {
                   // strike in
                   const percentage = 1 + 4 * (1 - scrollPercentage) - 4;
-                  const shift = 40 * percentage;
-                  const halfShift = shift * 1.25 + 20;
-                  return `translateX(${shift}px) rotate(-45deg) translateY(-${halfShift}px)`;
+                  const multiplier = screenSize != "xs" ? 40 : 80;
+
+                  const shiftX = multiplier * percentage;
+                  const shiftY = 40 * percentage * 1.25 + 20;
+                  return `translateX(${shiftX}px) rotate(-45deg) translateY(-${shiftY}px)`;
                 } else if (scrollPercentage < 0.5) {
                   // strike out
                   const percentage = 1 - 4 * (1 - scrollPercentage) + 2;
-                  const shift = 90 * percentage;
-                  const halfShift =
+                  const multiplier = screenSize != "xs" ? 90 : 50;
+
+                  const shiftX = multiplier * percentage;
+                  const shiftY =
                     percentage - 20 * (1 - percentage) + 15 * percentage;
-                  return `translateX(-${shift}px) rotate(-45deg) translateY(${halfShift}px)`;
+                  return `translateX(-${shiftX}px) rotate(-45deg) translateY(${shiftY}px)`;
                 } else
                   return "translateX(40px) rotate(-45deg) translateY(-20px)";
               }),
             }}
           />
         </motion.div>
-        <motion.div
+        {/* Progress Indicator for Testing Purposes */}
+        {/* <motion.div
           id="progress-indicator"
           style={{ scaleX: containerScrollY }}
           className="absolute bottom-0 h-5 w-full bg-transparent"
-        />
+        /> */}
       </div>
     </section>
   );
