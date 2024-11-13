@@ -18,6 +18,7 @@ interface Props {
   audioBlob: Blob;
   midiFile: Blob;
   controls: Controls[];
+  pageUpdate: boolean;
 }
 
 export default function AudioMidiVisualizer({
@@ -25,6 +26,7 @@ export default function AudioMidiVisualizer({
   audioBlob,
   midiFile,
   controls,
+  pageUpdate,
 }: Props) {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
@@ -204,6 +206,7 @@ export default function AudioMidiVisualizer({
             midiFile={midiFile}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
+            pageUpdate={pageUpdate}
             progress={progress}
             duration={duration}
             volume={midiVol}

@@ -18,7 +18,6 @@ export default function Page() {
   const [isEditingComplete, setIsEditingComplete] = useState(false);
   const flatRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-  const [embed, setEmbed] = useState<Embed | null>(null);
 
   // Convert to Midi
   useEffect(() => {
@@ -45,7 +44,7 @@ export default function Page() {
     console.log("Creating Flat.io embed");
     import("flat-embed")
       .then(({ default: Embed }) => {
-        const flatEmbed = new Embed(container, {
+        new Embed(container, {
           score: flatScore,
           embedParams: {
             appId: process.env.NEXT_PUBLIC_FLAT_APP_ID,
@@ -54,7 +53,6 @@ export default function Page() {
             controlsPosition: "bottom",
           },
         });
-        setEmbed(flatEmbed);
       })
       .catch((error) => {
         console.error("Failed to load flat-embed:", error);

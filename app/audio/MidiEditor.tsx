@@ -50,6 +50,7 @@ const MidiEditor = forwardRef(
     } = useContext(AudioContext);
     const [selectedMidi, setSelectedMidi] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [pageUpdate, setPageUpdate] = useState(false);
     const [midiOpen, setMidiOpen] = useState(false);
     const { toast } = useToast();
 
@@ -227,6 +228,7 @@ const MidiEditor = forwardRef(
           audioBlob={stem.audioBlob}
           midiFile={stem.midiBlob as Blob}
           controls={[midiControls, originalAudioControls]}
+          pageUpdate={pageUpdate}
         />
         <Accordion
           type="single"
@@ -276,7 +278,10 @@ const MidiEditor = forwardRef(
               {!isFirstKey && (
                 <AccordionItem
                   value="back"
-                  onClick={() => setSelectedMidi(selectedMidi - 1)}
+                  onClick={() => {
+                    setSelectedMidi(selectedMidi - 1);
+                    setPageUpdate(!pageUpdate);
+                  }}
                   className="button-secondary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-border px-6 py-2 text-base shadow-md transition-colors xl:max-w-[300px]"
                 >
                   Back <ArrowLeft className="size-4" />
@@ -285,7 +290,10 @@ const MidiEditor = forwardRef(
               {!isLastKey ? (
                 <AccordionItem
                   value="next"
-                  onClick={() => setSelectedMidi(selectedMidi + 1)}
+                  onClick={() => {
+                    setSelectedMidi(selectedMidi + 1);
+                    setPageUpdate(!pageUpdate);
+                  }}
                   className="button-primary flex h-min w-full cursor-pointer items-center justify-center gap-2 rounded-3xl px-6 py-2 text-base shadow-md transition-colors xl:max-w-[300px]"
                 >
                   Next <ArrowRight className="size-4" />

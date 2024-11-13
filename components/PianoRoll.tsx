@@ -13,6 +13,7 @@ interface PianoRollProps {
   midiFile: Blob;
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
+  pageUpdate: boolean;
   progress: number;
   duration: number;
   volume: number;
@@ -30,6 +31,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   midiFile,
   isPlaying,
   setIsPlaying,
+  pageUpdate,
   progress,
   duration,
   volume,
@@ -322,6 +324,12 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     audioControllerRef.current.volume.value = vol;
     audioControllerRef.current.pan.value = panAmnt;
   }, [vol, panAmnt]);
+
+  useEffect(() => {
+    if (isPlaying) {
+      stopMidi();
+    }
+  }, [pageUpdate]);
 
   return (
     <>
