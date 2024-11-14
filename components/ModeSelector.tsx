@@ -1,7 +1,6 @@
 import Bass from "@/components/Bass";
-import { AudioLines, Check, Drum, Guitar, MicVocal, Piano } from "lucide-react";
+import { AudioLines, Drum, Guitar, MicVocal, Piano } from "lucide-react";
 import type { SeparationMode } from "@/utils/types";
-import { Badge } from "@/components/ui/badge";
 import { forwardRef } from "react";
 
 const iconMap = {
