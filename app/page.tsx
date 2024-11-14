@@ -2,6 +2,7 @@ import GetStartedButton from "@/components/GetStartedButton";
 import HomeLogo from "@/components/HomeLogo";
 import BenefitSection from "@/app/BenefitSection";
 import ImpactSection from "./ImpactSection";
+import DemoSection from "./DemoSection";
 
 export default async function Home() {
   return (
@@ -24,6 +25,7 @@ export default async function Home() {
           <HomeLogo />
         </section>
         <BenefitSection />
+        <DemoSection />
         <ImpactSection />
       </div>
     </>
