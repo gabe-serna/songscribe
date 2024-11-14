@@ -18,6 +18,7 @@ interface PianoRollProps {
   duration: number;
   volume: number;
   pan: number;
+  isDemo?: boolean;
 }
 
 interface MidiNote {
@@ -36,6 +37,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
   duration,
   volume,
   pan,
+  isDemo = false,
 }) => {
   const parentRef = useRef<HTMLDivElement | null>(null);
   const pianoKeysCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -56,7 +58,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
   // Constants
   const pianoKeyWidth = 50;
-  const containerWidth = parentRef.current?.clientWidth || 800 - pianoKeyWidth;
+  const [containerWidth, setContainerWidth] = useState(0);
   const noteHeight = containerWidth > 600 ? 7 : containerWidth > 300 ? 6 : 5;
   const totalNotes = 88;
   const canvasHeight = totalNotes * noteHeight;
@@ -72,6 +74,11 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
   useEffect(() => {
     // Parse the MIDI file
+    if (!parentRef.current) return;
+    if (containerWidth === 0) {
+      setContainerWidth(parentRef.current.clientWidth - pianoKeyWidth);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = async () => {
       const arrayBuffer = await midiFile.arrayBuffer();
@@ -101,7 +108,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     };
 
     reader.readAsArrayBuffer(midiFile);
-  }, [midiFile]);
+  }, [midiFile, containerWidth]);
 
   // Draw piano keys with active notes highlighted
   const drawPianoKeys = (activeNotes: Set<string> = activeNotesRef.current) => {
@@ -176,7 +183,9 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     const measures = containerWidth > 600 ? 8 : containerWidth > 300 ? 6 : 4;
     const viewLength = measures * 4 * secondsPerBeat;
     const timeScale = containerWidth / viewLength; // Pixels Per Second
-    canvas.width = duration * timeScale + containerWidth - pianoKeyWidth;
+    canvas.width = duration * timeScale + containerWidth;
+    if (!isDemo) canvas.width -= pianoKeyWidth - 40;
+    else canvas.width -= 5;
 
     ctx.clearRect(0, 0, containerWidth, height);
 
@@ -330,6 +339,24 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       stopMidi();
     }
   }, [pageUpdate]);
+
+  // Add ResizeObserver effect
+  useEffect(() => {
+    if (!parentRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width - pianoKeyWidth);
+      }
+    });
+
+    resizeObserver.observe(parentRef.current);
+
+    // Cleanup
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   return (
     <>

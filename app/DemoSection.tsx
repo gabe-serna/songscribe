@@ -76,7 +76,7 @@ export default function DemoSection() {
   return (
     <section
       id="demo"
-      className="flex h-[120vh] w-screen flex-col items-center justify-start pt-12 sm:w-[calc(100vw-12px)] lg:pt-16 xl:pt-20"
+      className="flex h-[120vh] w-full flex-col items-center justify-start pt-12 max-lg:px-8 sm:w-[calc(100vw-12px)] lg:pt-16 xl:pt-20"
     >
       <h1 className="text-2xl font-semibold leading-tight sm:text-3xl xl:text-4xl">
         Try it Out!
@@ -89,6 +89,7 @@ export default function DemoSection() {
             midiFile={samples.midiBlob as Blob}
             controls={[midiControls, originalAudioControls]}
             pageUpdate={pageUpdate}
+            isDemo={true}
           />
         )}
         <Accordion

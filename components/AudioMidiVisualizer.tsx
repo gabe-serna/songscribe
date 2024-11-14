@@ -19,6 +19,7 @@ interface Props {
   midiFile: Blob;
   controls: Controls[];
   pageUpdate: boolean;
+  isDemo?: boolean;
 }
 
 export default function AudioMidiVisualizer({
@@ -27,6 +28,7 @@ export default function AudioMidiVisualizer({
   midiFile,
   controls,
   pageUpdate,
+  isDemo = false,
 }: Props) {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
@@ -211,6 +213,7 @@ export default function AudioMidiVisualizer({
             duration={duration}
             volume={midiVol}
             pan={midiPan}
+            isDemo={isDemo}
           />
         ) : (
           <Skeleton className="mb-9 flex h-[300px] items-center justify-center rounded-2xl bg-accent text-card-foreground shadow-lg dark:shadow-stone-900 xl:h-[400px]">
