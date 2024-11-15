@@ -57,7 +57,7 @@ export default function DemoSection() {
   return (
     <section
       id="demo"
-      className="flex min-h-screen w-full flex-col items-center justify-start pt-12 max-lg:px-8 sm:w-[calc(100vw-12px)] lg:pt-16 xl:pt-20"
+      className="flex min-h-screen w-full flex-col items-center justify-start pt-12 max-lg:px-8 lg:w-[calc(100vw-12px)] lg:pt-16 xl:pt-20"
     >
       <h1 className="text-2xl font-semibold leading-tight sm:text-3xl xl:text-4xl">
         See it in Action!

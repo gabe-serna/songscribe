@@ -119,7 +119,7 @@ a,
   @apply bg-accent font-semibold text-foreground hover:bg-stone-100 dark:hover:bg-stone-800;
 }
 .button-action {
-  @apply border-t-[3px] border-[#fef08bcc] bg-yellow-400 font-semibold text-foreground hover:bg-[#ffd52e] dark:border-[#f5bc52cc] dark:bg-yellow-600 dark:text-background dark:shadow-stone-900 dark:hover:bg-yellow-500;
+  @apply border-t-[3px] border-[#fef08bcc] bg-yellow-400 font-semibold text-foreground hover:bg-[#ffd52e] dark:border-[#f5bc52cc] dark:bg-yellow-600 dark:text-background dark:shadow-stone-900 dark:hover:bg-[#dd9700];
 }
 .button-action-disabled {
   @apply bg-stone-700 font-semibold text-background/70 opacity-70 hover:bg-stone-700 dark:bg-stone-400/70 dark:text-foreground/70 dark:shadow-stone-900 dark:hover:bg-stone-400/70;

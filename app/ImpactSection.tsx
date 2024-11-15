@@ -24,8 +24,9 @@ export default function ImpactSection() {
     <section
       ref={containerRef}
       id="impact"
-      className="relative z-30 flex h-[300vh] w-screen bg-[hsl(12,6%,15%)] dark:bg-[hsl(50,10%,92%)] sm:w-[calc(100vw-12px)]"
+      className="relative flex h-[420vh] w-screen border-0 bg-[hsl(12,6%,15%)] dark:bg-[hsl(50,10%,92%)] lg:w-[calc(100vw-12px)]"
     >
+      <div className="absolute inset-0 h-1/2 bg-gradient-to-b from-background to-transparent dark:via-background dark:via-15% max-lg:-translate-y-1" />
       <div
         ref={contentRef}
         className="impact-shadow sticky top-[30vh] my-[30vh] flex h-[40vh] w-full items-center justify-center bg-secondary-foreground shadow-pink-800/50 dark:shadow-pink-600/50"

@@ -27,6 +27,17 @@ export default async function Home() {
         <BenefitSection />
         <DemoSection />
         <ImpactSection />
+        <section
+          id="CTA"
+          className="flex h-[60vh] w-screen flex-col items-center justify-start bg-[hsl(12,6%,15%)] px-5 pt-[8vh] dark:bg-[hsl(50,10%,92%)] max-lg:-translate-y-1 sm:pt-4 lg:w-[calc(100vw-12px)]"
+        >
+          <div className="flex flex-col items-center p-4 sm:p-6 xl:p-8">
+            <h1 className="max-w-[30ch] text-center text-2xl font-semibold leading-tight text-background sm:text-3xl xl:text-4xl">
+              Experience effortless music transcription
+            </h1>
+            <GetStartedButton reverseTheme />
+          </div>
+        </section>
       </div>
     </>
   );
