@@ -7,7 +7,6 @@ import AudioForm from "./AudioForm";
 import handleMidiConversion from "@/utils/getMidi";
 import MidiEditor from "./MidiEditor";
 import ExportView from "./ExportView";
-import Embed from "flat-embed";
 
 export default function Page() {
   const { audioForm, audioStorage, setAudioStorage } = useContext(AudioContext);
@@ -74,7 +73,7 @@ export default function Page() {
 
   return (
     <div
-      className="flex w-full max-w-[1200px] flex-col items-center justify-around px-8 sm:px-20 xl:px-0"
+      className="flex w-full max-w-[1200px] flex-col items-center justify-around px-8 pb-5 sm:px-20 xl:px-0"
       id="resize container"
     >
       {!formComplete && <AudioForm setFormComplete={setFormComplete} />}

@@ -10,7 +10,7 @@ export default async function Home() {
       <div className="relative flex w-full flex-col items-center justify-center sm:px-20 xl:px-24">
         <section
           id="hero"
-          className="flex min-h-screen w-full max-w-[1000px] flex-shrink flex-col items-center justify-center lg:flex-row lg:justify-between xl:max-w-[1200px]"
+          className="flex min-h-[calc(100vh-64px)] w-full max-w-[1000px] flex-shrink flex-col items-center justify-center pb-20 lg:flex-row lg:justify-between lg:pl-8 xl:max-w-[1200px]"
         >
           <div className="flex flex-col max-lg:items-center">
             <h1 className="text-3xl font-semibold max-lg:text-center max-sm:max-w-[15ch] sm:w-[20ch] sm:text-4xl xl:w-[20ch] xl:text-5xl xl:leading-tight">
