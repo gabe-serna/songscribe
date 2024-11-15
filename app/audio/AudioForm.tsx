@@ -44,86 +44,92 @@ export default function AudioForm({
 
     // Set Tempo
     async function submitForm() {
-      console.log("submitting form");
-      // Get File if YT Link
-      let file = audioForm.audio_file;
-      if (audioForm.audio_link && !file) {
-        const formData = new FormData();
-        formData.append("youtube_url", audioForm.audio_link);
-        file = await getAudioFromURL(formData, setAudioForm);
-      }
+      try {
+        console.log("submitting form");
+        // Get File if YT Link
+        let file = audioForm.audio_file;
+        if (audioForm.audio_link && !file) {
+          const formData = new FormData();
+          formData.append("youtube_url", audioForm.audio_link);
+          file = await getAudioFromURL(formData, setAudioForm);
+        }
 
-      if (!file) {
-        // This shouldn't happen
-        setIsSubmitting(false);
-        setisLoadingVisible(false);
-        throw new Error("No audio file provided");
-      }
-      console.log("audio retrieved: ", file.name);
-
-      // Get Tempo
-      let tempo = 120;
-      if (!audioForm.tempo) {
-        tempo = await getTempo(file);
-        setAudioForm({ ...audioForm, tempo });
-      } else tempo = audioForm.tempo;
-      console.log("tempo: ", tempo);
-      songName.current = file.name.split(".")[0];
-
-      // Create Form Data
-      const formData = new FormData();
-      formData.append("audio_file", file);
-      formData.append("separation_mode", `${audioForm.separation_mode}`);
-      formData.append("tempo", `${tempo}`);
-      if (audioForm.start_time)
-        formData.append("start_time", `${audioForm.start_time}`);
-      if (audioForm.end_time)
-        formData.append("end_time", `${audioForm.end_time}`);
-
-      // Make API Request
-      isolateAudio(formData, setAudioStorage)
-        .then(() => {
-          setTimeout(() => {
-            setIsSubmitting(false);
-            setisLoadingVisible(false);
-          }, 2000);
-        })
-        .catch((error) => {
-          setAudioForm({});
+        if (!file) {
+          // This shouldn't happen
           setIsSubmitting(false);
           setisLoadingVisible(false);
-          let message: string;
+          throw new Error("No audio file provided");
+        }
+        console.log("audio retrieved: ", file.name);
 
-          if (
-            error.message.includes("Failed to fetch") ||
-            error.message.includes("ERR_CONNECTION_REFUSED")
-          ) {
-            message = "Make sure you have the backend running locally";
-          } else {
-            switch (error.message) {
-              case "404":
-                message = "Endpoint not Found";
-                break;
-              case "400":
-                message = "Invalid Form Data";
-                break;
-              case "422":
-                message = "Invalid Form Syntax";
-                break;
-              case "500":
-                message = "Internal Server Error";
-                break;
-              default:
-                message = "Failed to isolate audio";
-                break;
-            }
+        // Get Tempo
+        let tempo = 120;
+        if (!audioForm.tempo) {
+          tempo = await getTempo(file);
+          setAudioForm({ ...audioForm, tempo });
+        } else tempo = audioForm.tempo;
+        console.log("tempo: ", tempo);
+        songName.current = file.name.split(".")[0];
+
+        // Create Form Data
+        const formData = new FormData();
+        formData.append("audio_file", file);
+        formData.append("separation_mode", `${audioForm.separation_mode}`);
+        formData.append("tempo", `${tempo}`);
+        if (audioForm.start_time)
+          formData.append("start_time", `${audioForm.start_time}`);
+        if (audioForm.end_time)
+          formData.append("end_time", `${audioForm.end_time}`);
+
+        // Make API Request
+        await isolateAudio(formData, setAudioStorage);
+
+        // Success case
+        setTimeout(() => {
+          setIsSubmitting(false);
+          setisLoadingVisible(false);
+        }, 2000);
+      } catch (error: any) {
+        setAudioForm({});
+        setIsSubmitting(false);
+        setisLoadingVisible(false);
+        let message: string;
+
+        if (
+          error.message.includes("Failed to fetch") ||
+          error.message.includes("ERR_CONNECTION_REFUSED")
+        ) {
+          message = "Make sure you have the backend running locally.";
+        } else {
+          switch (error.message) {
+            case "404":
+              message = "Endpoint not Found.";
+              break;
+            case "400":
+              if (audioForm.audio_link) {
+                message =
+                  "Bad Request. Make sure the song is no longer than 6 minutes.";
+              } else {
+                message = "Invalid Form Data.";
+              }
+              break;
+            case "422":
+              message = "Invalid Form Syntax.";
+              break;
+            case "500":
+              message = "Internal Server Error.";
+              break;
+            default:
+              message = "Failed to isolate audio.";
+              break;
           }
-          toast({
-            variant: "destructive",
-            title: "Uh oh! Error Isolating Audio!",
-            description: message,
-          });
+        }
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Error Isolating Audio!",
+          description: message,
         });
+      }
     }
     submitForm();
   }, [isSubmitting]);

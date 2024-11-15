@@ -20,6 +20,7 @@ interface Props {
   controls: Controls[];
   pageUpdate: boolean;
   isDemo?: boolean;
+  hideTitle?: boolean;
 }
 
 export default function AudioMidiVisualizer({
@@ -29,6 +30,7 @@ export default function AudioMidiVisualizer({
   controls,
   pageUpdate,
   isDemo = false,
+  hideTitle = false,
 }: Props) {
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
@@ -200,7 +202,7 @@ export default function AudioMidiVisualizer({
       ref={parentRef}
       className="flex h-full w-full max-w-[800px] flex-col justify-center"
     >
-      <h1 className="text-2xl font-bold">{title}</h1>
+      {!hideTitle && <h1 className="text-2xl font-bold">{title}</h1>}
       <div className="mt-4">
         {duration !== null && midiFile ? (
           <PianoRoll

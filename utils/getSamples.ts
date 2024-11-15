@@ -1,7 +1,7 @@
 export default async function getSamples() {
   try {
-    const wavResponse = await fetch("/audio/rude_alpha_guitar.wav");
-    const midiResponse = await fetch("/audio/rude_alpha_guitar.mid");
+    const wavResponse = await fetch("/audio/demo.mp3");
+    const midiResponse = await fetch("/audio/demo.mid");
 
     if (!wavResponse.ok) {
       throw new Error(

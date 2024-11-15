@@ -358,6 +358,20 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     };
   }, []);
 
+  // Add this useEffect to set initial scroll position
+  useEffect(() => {
+    if (notesContainerRef.current) {
+      const totalHeight = notesContainerRef.current.scrollHeight;
+      const viewportHeight = notesContainerRef.current.clientHeight;
+      const middlePosition = (totalHeight - viewportHeight) / 2;
+
+      notesContainerRef.current.scrollTop = middlePosition;
+
+      // Since we're syncing scroll, this will also update the piano keys container
+      syncScroll();
+    }
+  }, [containerWidth]); // Add containerWidth as dependency to ensure this runs after canvas is sized
+
   return (
     <>
       <div
