@@ -48,7 +48,7 @@ export default function AudioPart3({
         onSubmit={form.handleSubmit(onSubmit)}
         className="mt-8 flex w-full flex-col items-center justify-center space-y-8"
       >
-        <div className="w-full min-w-[300px] max-w-[500px] rounded-2xl bg-accent p-6 shadow-lg dark:shadow-stone-900 lg:w-3/4 lg:p-8">
+        <div className="w-full min-w-[300px] max-w-[500px] rounded-2xl bg-accent p-6 shadow-lg dark:shadow-stone-950 lg:w-3/4 lg:p-8">
           <FormField
             control={form.control}
             name="start_time"

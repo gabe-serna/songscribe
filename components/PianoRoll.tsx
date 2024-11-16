@@ -376,7 +376,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
     <>
       <div
         ref={parentRef}
-        className="relative flex h-[300px] rounded-2xl bg-accent shadow-lg dark:shadow-stone-900 xl:h-[400px]"
+        className="relative flex h-[300px] rounded-2xl bg-accent shadow-lg dark:shadow-stone-950 xl:h-[400px]"
       >
         <div className="piano-roll-container relative flex w-full overflow-hidden rounded-2xl">
           {/* Piano Keys Container */}
@@ -409,7 +409,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       <div className="mt-[10px]">
         <Button
           onClick={isPlaying ? stopMidi : playMidi}
-          className="button-primary h-auto translate-y-4 rounded-xl bg-accent px-6 py-1 leading-none shadow-md *:size-6 *:stroke-yellow-500 dark:shadow-stone-900 *:dark:stroke-yellow-700"
+          className="button-primary h-auto translate-y-4 rounded-xl bg-accent px-6 py-1 leading-none shadow-md *:size-6 *:stroke-yellow-500 dark:shadow-stone-950 *:dark:stroke-yellow-700"
         >
           {isPlaying ? <PauseCircle /> : <PlayCircle />}
         </Button>

@@ -19,7 +19,7 @@ const ExportView = forwardRef<HTMLDivElement>((_props, ref) => {
     <div className="flex w-full flex-col items-start justify-center max-xl:max-w-[800px] xl:flex-row xl:space-x-12">
       <div
         ref={ref}
-        className="flex h-[400px] w-full max-w-[800px] items-center justify-center overflow-hidden rounded-2xl shadow-lg dark:shadow-stone-900 xl:h-[565.6px]"
+        className="flex h-[400px] w-full max-w-[800px] items-center justify-center overflow-hidden rounded-2xl shadow-lg dark:shadow-stone-950 xl:h-[565.6px]"
       />
       <Accordion
         type="single"

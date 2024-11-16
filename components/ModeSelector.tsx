@@ -37,7 +37,7 @@ const modeData: Record<
 };
 const selectedClassName = "outline-green-400 dark:outline-green-600 ";
 const figureClassName =
-  "relative w-full rounded-2xl bg-accent p-6 pt-3 transition-all outline outline-4 cursor-pointer box-border shadow-lg dark:shadow-stone-900 ";
+  "relative w-full rounded-2xl bg-accent p-6 pt-3 transition-all outline outline-4 cursor-pointer box-border shadow-lg dark:shadow-stone-950 ";
 const figcaptionClassName =
   "pb-1 font-bold uppercase text-stone-600 dark:text-stone-500";
 const iconContainerClassName =

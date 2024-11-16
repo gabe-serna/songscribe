@@ -218,7 +218,7 @@ export default function AudioMidiVisualizer({
             isDemo={isDemo}
           />
         ) : (
-          <Skeleton className="mb-9 flex h-[300px] items-center justify-center rounded-2xl bg-accent text-card-foreground shadow-lg dark:shadow-stone-900 xl:h-[400px]">
+          <Skeleton className="mb-9 flex h-[300px] items-center justify-center rounded-2xl bg-accent text-card-foreground shadow-lg dark:shadow-stone-950 xl:h-[400px]">
             Generating Midi...
           </Skeleton>
         )}

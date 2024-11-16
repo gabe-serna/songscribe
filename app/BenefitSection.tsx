@@ -55,7 +55,7 @@ export default function BenefitSection() {
           when you need it.
         </BenefitCard>
         {isMobile && (
-          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-900"></div>
+          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-950"></div>
         )}
         <BenefitCard
           title="Automatic MIDI transcription"
@@ -66,7 +66,7 @@ export default function BenefitSection() {
           MIDI for an instant transcription ready for you to shape and perfect.
         </BenefitCard>
         {isMobile && (
-          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-900"></div>
+          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-950"></div>
         )}
         <BenefitCard
           title="Customize and refine with ease"
@@ -78,7 +78,7 @@ export default function BenefitSection() {
           each detail exactly as you want.
         </BenefitCard>
         {isMobile && (
-          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-900"></div>
+          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-950"></div>
         )}
         <BenefitCard
           title="Turn songs into sheet music"
@@ -90,14 +90,14 @@ export default function BenefitSection() {
           editor, or download the isolated stems.
         </BenefitCard>
         {isMobile && (
-          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-900"></div>
+          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-950"></div>
         )}
       </div>
       {!isMobile && (
         <div id="benefit-video" className="sticky top-[20vh] mb-[30vh] mt-8">
           <div
             ref={videoRef}
-            className="flex h-[350px] max-h-[800px] min-h-[100px] w-full items-center justify-center rounded-3xl bg-white text-black shadow-lg [aspect-ratio:1_/_1] xl:h-[450px]"
+            className="flex h-[350px] max-h-[800px] min-h-[100px] w-full items-center justify-center rounded-3xl bg-white text-black shadow-lg [aspect-ratio:1_/_1] dark:shadow-stone-950 xl:h-[450px]"
           >
             {focusedCard}
           </div>

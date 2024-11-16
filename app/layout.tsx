@@ -43,7 +43,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="flex min-h-screen flex-col items-center">
+          <main className="flex min-h-screen flex-col items-center overflow-x-hidden">
             <div className="flex w-full flex-1 flex-col items-center">
               <div
                 id="main-content-container"
