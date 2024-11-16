@@ -133,7 +133,7 @@ export default function AudioForm({
   }, [isSubmitting]);
 
   return (
-    <div className="flex h-max">
+    <div className="mb-20 flex h-max">
       <CSSTransition
         nodeRef={part1Ref}
         in={!isPart1Complete}

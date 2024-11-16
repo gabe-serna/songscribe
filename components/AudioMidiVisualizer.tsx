@@ -218,9 +218,13 @@ export default function AudioMidiVisualizer({
             isDemo={isDemo}
           />
         ) : (
-          <Skeleton className="mb-9 flex h-[300px] items-center justify-center rounded-2xl bg-accent text-card-foreground shadow-lg dark:shadow-stone-950 xl:h-[400px]">
-            Generating Midi...
-          </Skeleton>
+          <div>
+            <Skeleton className="flex h-[300px] items-center justify-center rounded-2xl bg-accent text-card-foreground shadow-lg dark:shadow-stone-950 xl:h-[400px]">
+              Generating Midi...
+            </Skeleton>
+            <div className="h-[42px]" />{" "}
+            {/* Compensate for button height + margin */}
+          </div>
         )}
       </div>
       <div className="mb-8 w-full rounded-2xl bg-accent p-4 shadow-lg">

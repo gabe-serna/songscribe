@@ -382,6 +382,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
           {/* Piano Keys Container */}
           <div
             ref={pianoKeysContainerRef}
+            tabIndex={-1}
             className="piano-keys-container no-scrollbar overflow-y-hidden"
           >
             <canvas
@@ -394,6 +395,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
           {/* Notes Container */}
           <div
             ref={notesContainerRef}
+            tabIndex={-1}
             className="h-full w-full overflow-x-hidden overflow-y-scroll"
             onScroll={syncScroll}
           >
