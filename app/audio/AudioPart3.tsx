@@ -134,7 +134,7 @@ export default function AudioPart3({
           type="submit"
           className="button-action mt-4 w-full rounded-full text-base shadow-md max-lg:text-lg sm:max-lg:py-6 lg:w-3/4"
         >
-          Submit
+          Transcribe
         </Button>
       </form>
     </Form>

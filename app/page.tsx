@@ -13,7 +13,7 @@ export default async function Home() {
       <div className="relative flex w-full flex-col items-center justify-center sm:px-20 xl:px-24">
         <section
           id="hero"
-          className="flex min-h-[calc(100vh-64px)] w-full max-w-[1000px] flex-shrink flex-col items-center justify-center pb-20 lg:flex-row lg:justify-between lg:pl-8 xl:max-w-[1200px]"
+          className="flex min-h-[calc(100vh-64px)] w-full max-w-[1000px] flex-shrink flex-col items-center justify-center pb-10 lg:flex-row lg:justify-between lg:pl-8 xl:max-w-[1200px]"
         >
           <div className="flex flex-col max-lg:items-center">
             <h1 className="text-3xl font-semibold max-lg:text-center max-sm:max-w-[15ch] sm:w-[20ch] sm:text-4xl xl:w-[20ch] xl:text-5xl xl:leading-tight">
@@ -32,7 +32,7 @@ export default async function Home() {
         <ImpactSection />
         <section
           id="CTA"
-          className="flex h-[60vh] w-screen flex-col items-center justify-start bg-[hsl(12,6%,15%)] px-5 pt-[8vh] dark:bg-[hsl(50,10%,92%)] max-lg:-translate-y-1 sm:pt-4 lg:w-[calc(100vw-12px)]"
+          className="flex h-[60vh] w-screen -translate-y-1 flex-col items-center justify-start overflow-x-hidden bg-[hsl(12,6%,15%)] px-5 pt-[8vh] dark:bg-[hsl(50,10%,92%)] sm:pt-4"
         >
           <div className="flex flex-col items-center p-4 sm:p-6 xl:p-8">
             <h1 className="max-w-[30ch] text-center text-2xl font-semibold leading-tight text-background sm:text-3xl xl:text-4xl">

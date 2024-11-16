@@ -48,9 +48,22 @@ That's why I made **Songscribe**, a tool for jumpstarting the transcription proc
 
 ## Quick Start
 
-You can get started with Songscribe by visiting [songscribe.xyz](https://songscribe.xyz).
+You can get started transcribing with Songscribe by visiting **[songscribe.xyz](https://songscribe.xyz)**.
 
-> <p>Currently, the API backend powering the audio isolation and audio to MIDI conversion is not hosted anywhere (<i>the machine learning models are a bit too intensive for free hosting solutions</i>). <br><br> <strong>This means you will have to run the API locally.</strong> Extensive documentation on how to do so have been provided for you <a href="https://github.com/gabe-serna/songscribe-api?tab=readme-ov-file#songscribe-api">here</a> for this reason.</p>
+Here's a quick overview of how to use Songscribe:
+
+- Upload the song you want to transcribe
+  - File Upload
+  - YouTube Link
+- Choose the preset that best suits the song you're transcribing
+  - **Solo** (1 instrument)
+  - **Duet** (vocals, no vocals)
+  - **Small Band** (vocals, drums, bass, and other instruments)
+  - **Full Band** (vocals, drums, bass, guitar, piano, and other instruments)
+- Optionally, select the tempo and the start time and end time of the song to be transcribed
+- Click the **Transcribe** button
+- Adjust the MIDI parameters to regenerate the transcription for each instrument to your liking
+- Click the **Export** button to create the final score and download all files generated from the session
 
 <br/>
 
@@ -58,7 +71,7 @@ You can get started with Songscribe by visiting [songscribe.xyz](https://songscr
 
 Here is a quick breakdown of all the main technologies used to create Songscribe.
 
-Frontend:
+**[Frontend](https://github.com/gabe-serna/songscribe)**:
 
 - React
 - Next.js
@@ -69,15 +82,16 @@ Frontend:
   - **[wavesurfer.js](https://github.com/katspaugh/wavesurfer.js)**- Waveform Visualization
   - **[Flat Embed](https://github.com/FlatIO/embed-client)**- Embedded sheet music viewer
 
-Backend:
+**[Backend](https://github.com/gabe-serna/songscribe-api)**:
 
 - Python
 - Libraries:
   - **[Moseca](https://github.com/fabiogra/moseca)**- Instrument separation
-  - **[Spotify Basic Pitch](https://github.com/spotify/basic-pitch)**- Audio to MIDI conversion
+  - **[Basic Pitch](https://github.com/spotify/basic-pitch)**- Audio to MIDI conversion
+  - **[ADTOF](https://github.com/MZehren/ADTOF)**- Drum transcription
 
 <br/>
 
 ## Feedback and issues
 
-Please file feedback and issues over on [Github Issues](https://github.com/gabe-serna/songscribe/issues/new).
+Please file feedback and issues over on [Github Issues](https://github.com/gabe-serna/songscribe/issues/new). All feedback is welcome!

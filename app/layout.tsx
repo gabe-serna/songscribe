@@ -43,11 +43,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="flex min-h-screen flex-col items-center overflow-x-hidden">
+          <main className="flex min-h-screen flex-col items-center">
             <div className="flex w-full flex-1 flex-col items-center">
               <div
                 id="main-content-container"
-                className="flex min-h-screen w-full flex-col items-center justify-center gap-20 px-5 pt-20"
+                className="flex min-h-screen w-full flex-col items-center justify-center gap-20 px-5 pt-10"
               >
                 {children}
               </div>

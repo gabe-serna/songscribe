@@ -2,6 +2,7 @@
 
 import Lenis from "@studio-freight/lenis";
 import { useEffect } from "react";
+import CustomScrollbar from "./CustomScrollbar";
 
 export default function SmoothScroll({
   children,
@@ -30,5 +31,10 @@ export default function SmoothScroll({
     };
   }, []);
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <CustomScrollbar />
+    </>
+  );
 }
