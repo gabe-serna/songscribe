@@ -3,10 +3,12 @@ import HomeLogo from "@/components/HomeLogo";
 import BenefitSection from "@/app/BenefitSection";
 import ImpactSection from "./ImpactSection";
 import DemoSection from "./DemoSection";
+import { Navbar } from "@/components/navbar";
 
 export default async function Home() {
   return (
     <>
+      <Navbar />
       <div className="relative flex w-full flex-col items-center justify-center sm:px-20 xl:px-24">
         <section
           id="hero"

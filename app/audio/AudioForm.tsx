@@ -56,8 +56,6 @@ export default function AudioForm({
 
         if (!file) {
           // This shouldn't happen
-          setIsSubmitting(false);
-          setisLoadingVisible(false);
           throw new Error("No audio file provided");
         }
         console.log("audio retrieved: ", file.name);
@@ -149,7 +147,7 @@ export default function AudioForm({
           className="flex flex-col items-center justify-center space-y-16"
         >
           <h1 className="w-[15ch] text-center text-3xl font-bold md:w-auto md:text-4xl">
-            The fastest way to turn any song into sheet music
+            Upload the song you want to transcribe
           </h1>
           <AudioPart1 />
         </div>

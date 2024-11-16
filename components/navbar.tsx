@@ -31,7 +31,7 @@ export function Navbar() {
         scrollDirection === "down" ? "-translate-y-full" : "translate-y-0"
       }`}
     >
-      <div className="mx-auto flex h-16 w-full items-center justify-between px-5 sm:px-[6.5rem] xl:px-[8rem]">
+      <div className="mx-auto flex h-16 w-full items-center justify-between px-5 sm:px-[6.5rem] sm:pr-[5rem] xl:px-[8rem] xl:pr-[6rem]">
         <Link href="/" className="text-xl font-bold">
           Songscribe
         </Link>
