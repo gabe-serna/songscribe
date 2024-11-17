@@ -56,10 +56,10 @@ Here's a quick overview of how to use Songscribe:
   - File Upload
   - YouTube Link
 - Choose the preset that best suits the song you're transcribing
-  - **Solo** (1 instrument)
-  - **Duet** (vocals, no vocals)
-  - **Small Band** (vocals, drums, bass, and other instruments)
-  - **Full Band** (vocals, drums, bass, guitar, piano, and other instruments)
+  - **Solo**- (1 instrument)
+  - **Duet**- (vocals, no vocals)
+  - **Small Band**- (vocals, drums, bass, and other instruments)
+  - **Full Band**- (vocals, drums, bass, guitar, piano, and other instruments)
 - Optionally, select the tempo and the start time and end time of the song to be transcribed
 - Click the **Transcribe** button
 - Adjust the MIDI parameters to regenerate the transcription for each instrument to your liking

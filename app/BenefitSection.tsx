@@ -2,6 +2,7 @@
 import BenefitCard from "@/components/BenefitCard";
 import { useScreenSize } from "@/hooks/use-screen-size";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 export default function BenefitSection() {
   const screenSize = useScreenSize();
@@ -10,7 +11,13 @@ export default function BenefitSection() {
 
   const [observer, setObserver] = useState<IntersectionObserver | null>(null);
   const [focusedCard, setFocusedCard] = useState<number>(1);
+  const [isMounted, setIsMounted] = useState(false);
   const videoRef = useRef<HTMLDivElement>(null);
+
+  // Handle component mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const callback = (entries: IntersectionObserverEntry[]) => {
@@ -55,7 +62,16 @@ export default function BenefitSection() {
           when you need it.
         </BenefitCard>
         {isMobile && (
-          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-950"></div>
+          <div className="relative mx-auto mb-[5vh] aspect-square h-[35vh] overflow-hidden rounded-3xl bg-white shadow-lg dark:shadow-stone-950">
+            <Image
+              src="/videos/demo-1.gif"
+              alt="Demo 1"
+              fill
+              className="size-full object-cover"
+              unoptimized
+              priority
+            />
+          </div>
         )}
         <BenefitCard
           title="Automatic MIDI transcription"
@@ -66,7 +82,16 @@ export default function BenefitSection() {
           MIDI for an instant transcription ready for you to shape and perfect.
         </BenefitCard>
         {isMobile && (
-          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-950"></div>
+          <div className="relative mx-auto mb-[5vh] aspect-square h-[35vh] overflow-hidden rounded-3xl bg-white shadow-lg dark:shadow-stone-950">
+            <Image
+              src="/videos/demo-2.gif"
+              alt="Demo 2"
+              fill
+              className="size-full object-cover"
+              unoptimized
+              priority
+            />
+          </div>
         )}
         <BenefitCard
           title="Customize and refine with ease"
@@ -78,7 +103,16 @@ export default function BenefitSection() {
           each detail exactly as you want.
         </BenefitCard>
         {isMobile && (
-          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-950"></div>
+          <div className="relative mx-auto mb-[5vh] aspect-square h-[35vh] overflow-hidden rounded-3xl bg-white shadow-lg dark:shadow-stone-950">
+            <Image
+              src="/videos/demo-3.gif"
+              alt="Demo 3"
+              fill
+              className="size-full object-cover"
+              unoptimized
+              priority
+            />
+          </div>
         )}
         <BenefitCard
           title="Turn songs into sheet music"
@@ -90,16 +124,35 @@ export default function BenefitSection() {
           editor, or download the isolated stems.
         </BenefitCard>
         {isMobile && (
-          <div className="mx-auto mb-[5vh] aspect-square h-[35vh] rounded-3xl bg-white shadow-lg dark:shadow-stone-950"></div>
+          <div className="relative mx-auto mb-[5vh] aspect-square h-[35vh] overflow-hidden rounded-3xl bg-white shadow-lg dark:shadow-stone-950">
+            <Image
+              src="/videos/demo-4.gif"
+              alt="Demo 4"
+              fill
+              className="size-full object-cover"
+              unoptimized
+              priority
+            />
+          </div>
         )}
       </div>
       {!isMobile && (
         <div id="benefit-video" className="sticky top-[20vh] mb-[30vh] mt-8">
           <div
             ref={videoRef}
-            className="flex h-[350px] max-h-[800px] min-h-[100px] w-full items-center justify-center rounded-3xl bg-white text-black shadow-lg [aspect-ratio:1_/_1] dark:shadow-stone-950 xl:h-[450px]"
+            className="relative flex h-[350px] max-h-[800px] min-h-[100px] w-full items-center justify-center rounded-3xl bg-white text-black shadow-xl [aspect-ratio:1_/_1] dark:bg-accent dark:shadow-stone-950 xl:h-[450px]"
           >
-            {focusedCard}
+            {isMounted && (
+              <Image
+                key={focusedCard}
+                src={`/videos/demo-${focusedCard}.gif`}
+                alt={`Demo ${focusedCard}`}
+                fill
+                className="rounded-3xl object-cover"
+                unoptimized
+                priority
+              />
+            )}
           </div>
         </div>
       )}
