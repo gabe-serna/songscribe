@@ -16,7 +16,6 @@ export default async function getAudioFromURL(
       error.message.includes("Failed to fetch") ||
       error.message.includes("ERR_CONNECTION_REFUSED")
     ) {
-      console.log("Error: Failed to Fetch");
       throw new Error(error.message);
     }
   });
@@ -31,6 +30,5 @@ export default async function getAudioFromURL(
   const file = new File([blob], "youtube_audio.mp3", { type: blob.type });
   setAudioForm((prev) => ({ ...prev, audio_file: file }));
 
-  console.log("YT audio retrieved successfully");
   return file;
 }

@@ -16,7 +16,6 @@ export async function createScore(midiFile: Blob, title: string) {
       dataEncoding: "base64",
     }),
   }).catch((error) => {
-    console.log(error);
     if (error.message.includes("402")) {
       throw new Error("402");
     } else throw new Error("0");

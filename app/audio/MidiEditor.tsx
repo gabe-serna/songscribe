@@ -33,11 +33,12 @@ interface Props {
   conversionFlag: Dispatch<SetStateAction<boolean>>;
   isMidiComplete: boolean;
   setFlatScore: Dispatch<SetStateAction<string | null>>;
+  setShowSheetMusic: Dispatch<SetStateAction<boolean>>;
 }
 
 const MidiEditor = forwardRef(
   (
-    { conversionFlag, isMidiComplete, setFlatScore }: Props,
+    { conversionFlag, isMidiComplete, setFlatScore, setShowSheetMusic }: Props,
     ref: React.ForwardedRef<HTMLDivElement>,
   ) => {
     const {
@@ -124,7 +125,6 @@ const MidiEditor = forwardRef(
       const maxIndex = parseInt(formData.get("maximum_frequency") as string);
       const maxFreq = frequencies[maxIndex];
       if (maxFreq < 13000) {
-        console.log("maxFreq", maxFreq);
         adjustments.maximum_frequency = maxFreq.toString();
       }
 
@@ -132,7 +132,6 @@ const MidiEditor = forwardRef(
       const minIndex = parseInt(formData.get("minimum_frequency") as string);
       const minFreq = frequencies[minIndex];
       if (minFreq > 0) {
-        console.log("minFreq", minFreq);
         adjustments.minimum_frequency = minFreq.toString();
       }
 
@@ -168,7 +167,6 @@ const MidiEditor = forwardRef(
 
       try {
         const names = Object.keys(audioStorage);
-
         const midiFiles = await Promise.all(
           Object.entries(audioStorage as Record<keyof AudioStorage, Stem>).map(
             async ([_, stem]) => {
@@ -189,24 +187,24 @@ const MidiEditor = forwardRef(
         const blob = new Blob([finalMidiFile.current], {
           type: "application/octet-stream",
         });
-        console.log("creating flat score...");
-        const response = await createScore(blob, songName.current);
-        setFlatScore(response.id);
 
-        // **For Testing: Download the merged MIDI file**
-        // const url = URL.createObjectURL(blob);
-        // const a = document.createElement("a");
-        // a.href = url;
-        // a.download = "TranscribedSong.mid";
-        // a.click();
-        // URL.revokeObjectURL(url);
-      } catch (error: any) {
-        if (error.message === "402") {
-          message.current =
-            "Score limit reached. Please try again at the start of the next hour.";
-        } else {
-          message.current = "Failed to merge midi files.";
+        try {
+          const response = await createScore(blob, songName.current);
+          setFlatScore(response.id);
+          setShowSheetMusic(true);
+        } catch (error: any) {
+          if (error.message === "402") {
+            message.current =
+              "Score limit reached. Please try again at the start of the next hour.";
+            setShowSheetMusic(false);
+            // Still set flatScore to trigger transition, but with a dummy value
+            setFlatScore("error-402");
+          } else {
+            throw error;
+          }
         }
+      } catch (error: any) {
+        message.current = "Failed to merge midi files.";
         console.error(message.current);
       } finally {
         setIsSubmitting(false);

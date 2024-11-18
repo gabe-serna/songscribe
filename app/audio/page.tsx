@@ -15,6 +15,7 @@ export default function Page() {
   const [isConverting, setIsConverting] = useState(false);
   const [isMidiComplete, setIsMidiComplete] = useState(false);
   const [isEditingComplete, setIsEditingComplete] = useState(false);
+  const [showSheetMusic, setShowSheetMusic] = useState(true);
   const flatRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +41,9 @@ export default function Page() {
     const container = flatRef.current;
     if (!container || !flatScore) return;
 
-    console.log("Creating Flat.io embed");
+    // Don't try to create embed for error state
+    if (flatScore === "error-402") return;
+
     import("flat-embed")
       .then(({ default: Embed }) => {
         new Embed(container, {
@@ -91,6 +94,7 @@ export default function Page() {
           conversionFlag={setIsConverting}
           isMidiComplete={isMidiComplete}
           setFlatScore={setFlatScore}
+          setShowSheetMusic={setShowSheetMusic}
         />
       </CSSTransition>
       <CSSTransition
@@ -100,7 +104,7 @@ export default function Page() {
         classNames="fade"
         unmountOnExit
       >
-        <ExportView ref={flatRef} />
+        <ExportView ref={flatRef} showSheetMusic={showSheetMusic} />
       </CSSTransition>
     </div>
   );

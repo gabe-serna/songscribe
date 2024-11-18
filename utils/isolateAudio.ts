@@ -21,7 +21,6 @@ export default async function isolateAudio(
         error.message.includes("Failed to fetch") ||
         error.message.includes("ERR_CONNECTION_REFUSED")
       ) {
-        console.log("Error: Failed to Fetch");
         throw new Error(error.message);
       }
     });
@@ -46,7 +45,6 @@ export default async function isolateAudio(
         });
       });
     });
-    console.log("Audio isolated successfully");
   }
 
   async function alignSingle() {
@@ -62,7 +60,6 @@ export default async function isolateAudio(
         error.message.includes("Failed to fetch") ||
         error.message.includes("ERR_CONNECTION_REFUSED")
       ) {
-        console.log("failed to fetch error");
         throw new Error(error.message);
       }
     });
@@ -81,7 +78,5 @@ export default async function isolateAudio(
           no_vocals: { name: "no_vocals", audioBlob: blob, midiBlob: null },
         }) as AudioStorage,
     );
-
-    console.log("Audio aligned successfully");
   }
 }

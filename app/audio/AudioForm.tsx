@@ -45,7 +45,6 @@ export default function AudioForm({
     // Set Tempo
     async function submitForm() {
       try {
-        console.log("submitting form");
         // Get File if YT Link
         let file = audioForm.audio_file;
         if (audioForm.audio_link && !file) {
@@ -58,7 +57,6 @@ export default function AudioForm({
           // This shouldn't happen
           throw new Error("No audio file provided");
         }
-        console.log("audio retrieved: ", file.name);
 
         // Get Tempo
         let tempo = 120;
@@ -66,7 +64,7 @@ export default function AudioForm({
           tempo = await getTempo(file);
           setAudioForm({ ...audioForm, tempo });
         } else tempo = audioForm.tempo;
-        console.log("tempo: ", tempo);
+        // console.log("tempo: ", tempo);
         songName.current = file.name.split(".")[0];
 
         // Create Form Data
