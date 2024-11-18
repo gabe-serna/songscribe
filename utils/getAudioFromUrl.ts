@@ -22,7 +22,10 @@ export default async function getAudioFromURL(
 
   if (response) {
     if (!response.ok) {
-      throw new Error(`${response.status}`);
+      const message = await response.json();
+      if (message.error.includes("bot")) {
+        throw new Error("401");
+      } else throw new Error(`${response.status}`);
     }
   } else throw new Error("0");
 

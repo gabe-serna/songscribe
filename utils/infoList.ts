@@ -9,4 +9,5 @@ export const infoList = [
   "If you want to remove the MIDI transcription for an instrument that isn't part of the song, set the confidence threshold all the way up and regenerate it.",
   "To continue working on the transcription, you can download the MIDI file and upload it to your music notation editor of choice.",
   "If the automatic transcription isn't very accurate, you can download the isolated audio for each instrument and continue to transcribe it yourself.",
+  "To isolate 30 seconds of audio, expect the process to take around 1 minute or more depending on the amount of instruments.",
 ];

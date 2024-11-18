@@ -57,15 +57,18 @@ export default function RootLayout({
                   <div className="flex items-center gap-8 max-sm:flex-col max-sm:items-start max-sm:gap-4">
                     <h1 className="text-nowrap text-muted-foreground">
                       &copy; {new Date().getFullYear()}{" "}
-                      <Link href="/" className="font-semibold">
+                      <Link href="/" className="font-heading">
                         Songscribe
                       </Link>
                     </h1>
                     <h1 className="text-nowrap text-muted-foreground">
                       Created by Gabriel Serna
                     </h1>
-                    <h1 className="text-nowrap font-semibold text-muted-foreground">
-                      <Link href="https://github.com/gabe-serna/songscribe">
+                    <h1 className="text-nowrap text-muted-foreground">
+                      <Link
+                        className="font-heading"
+                        href="https://github.com/gabe-serna/songscribe"
+                      >
                         GitHub
                       </Link>
                     </h1>

@@ -140,7 +140,7 @@ export default function BenefitSection() {
         <div id="benefit-video" className="sticky top-[20vh] mb-[30vh] mt-8">
           <div
             ref={videoRef}
-            className="relative flex h-[350px] max-h-[800px] min-h-[100px] w-full items-center justify-center rounded-3xl bg-[hsl(50,10%,92%)] text-black shadow-xl [aspect-ratio:1_/_1] dark:bg-accent dark:shadow-stone-950 xl:h-[450px]"
+            className="relative flex aspect-square h-[350px] max-h-[800px] min-h-[100px] w-full items-center justify-center rounded-3xl bg-[hsl(50,10%,92%)] text-black shadow-xl dark:bg-accent dark:shadow-stone-950 xl:h-[450px]"
           >
             {isMounted && (
               <Image

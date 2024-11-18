@@ -109,6 +109,14 @@ export default function AudioForm({
                 message = "Invalid Form Data.";
               }
               break;
+            case "401":
+              if (audioForm.audio_link) {
+                message =
+                  "Unable to access YouTube. Please upload your song as a file instead. Sorry :(";
+              } else {
+                message = "Forbidden. Please try again later.";
+              }
+              break;
             case "422":
               message = "Invalid Form Syntax.";
               break;
