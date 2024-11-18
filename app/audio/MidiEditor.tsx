@@ -28,6 +28,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import sliderFrequencyScaling from "@/utils/sliderFrequencyScaling";
+import { clearScores } from "@/utils/clearScores";
 
 interface Props {
   conversionFlag: Dispatch<SetStateAction<boolean>>;
@@ -188,17 +189,43 @@ const MidiEditor = forwardRef(
           type: "application/octet-stream",
         });
 
+        // First attempt to create score
         try {
           const response = await createScore(blob, songName.current);
           setFlatScore(response.id);
           setShowSheetMusic(true);
         } catch (error: any) {
           if (error.message === "402") {
-            message.current =
-              "Score limit reached. Please try again at the start of the next hour.";
-            setShowSheetMusic(false);
-            // Still set flatScore to trigger transition, but with a dummy value
-            setFlatScore("error-402");
+            try {
+              const baseUrl = window.location.origin;
+              const cleared = await clearScores(baseUrl);
+              if (!cleared) throw new Error("Failed to clear scores");
+
+              // Wait a moment for deletion to complete
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+
+              // Second attempt to create score
+              try {
+                const retryResponse = await createScore(blob, songName.current);
+                setFlatScore(retryResponse.id);
+                setShowSheetMusic(true);
+              } catch (retryError: any) {
+                if (retryError.message === "402") {
+                  message.current =
+                    "Score limit reached. Please try again tomorrow.";
+                  setShowSheetMusic(false);
+                  setFlatScore("error-402");
+                } else {
+                  throw retryError;
+                }
+              }
+            } catch (cronError) {
+              console.error("Failed to clear scores:", cronError);
+              message.current =
+                "Score limit reached. Please try again tomorrow.";
+              setShowSheetMusic(false);
+              setFlatScore("error-402");
+            }
           } else {
             throw error;
           }
