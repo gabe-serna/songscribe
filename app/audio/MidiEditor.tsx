@@ -17,7 +17,7 @@ import { createScore } from "@/utils/flat";
 import { convertToMidi } from "@/utils/getMidi";
 import mergeMidi from "@/utils/mergeMidi";
 import { AudioStorage, midiAdjustments, Stem } from "@/utils/types";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, CloudCog } from "lucide-react";
 import AudioMidiVisualizer from "@/components/AudioMidiVisualizer";
 import MidiAdjustments from "@/components/MidiAdjustments";
 import AudioMixer from "@/components/AudioMixer";
@@ -200,9 +200,14 @@ const MidiEditor = forwardRef(
         // a.download = "TranscribedSong.mid";
         // a.click();
         // URL.revokeObjectURL(url);
-      } catch (error) {
-        message.current = "Failed to merge midi files.";
-        console.error(error);
+      } catch (error: any) {
+        if (error.message === "402") {
+          message.current =
+            "Score limit reached. Please try again at the start of the next hour.";
+        } else {
+          message.current = "Failed to merge midi files.";
+        }
+        console.error(message.current);
       } finally {
         setIsSubmitting(false);
       }

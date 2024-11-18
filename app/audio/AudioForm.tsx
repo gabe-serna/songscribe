@@ -97,7 +97,7 @@ export default function AudioForm({
           error.message.includes("Failed to fetch") ||
           error.message.includes("ERR_CONNECTION_REFUSED")
         ) {
-          message = "Make sure you have the backend running locally.";
+          message = "Make sure the backend server is running.";
         } else {
           switch (error.message) {
             case "404":
